@@ -6,35 +6,6 @@ using System.Threading.Tasks;
 
 namespace ChessBoard
 {
-	/* public enum MovementType
-	{
-		Forward = 1,
-		Omni,
-		Axis,
-		Diagonal,
-		L
-	}
-
-	public class PieceType
-	{
-		public readonly int Value;
-		public readonly int Range;
-		public readonly MovementType Movement;
-		public readonly int FirstMoveRange;
-		public readonly bool Promotable;
-
-		public PieceType(int value, int range, MovementType movement)
-		{
-			Value = value;
-			Range = range;
-			Movement = movement;
-			FirstMoveRange = range;
-			Promotable = false;
-		}
-
-		public static PieceType Pawn = new PieceType();
-	} */
-
 	/// <summary>
 	/// The particular type of piece on (or off of) the board. Movement, game status, and verification regarding pieces all stem from this type.
 	/// </summary>
