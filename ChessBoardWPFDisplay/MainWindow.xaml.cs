@@ -38,7 +38,7 @@ namespace ChessBoardWPFDisplay
 		{
 			foreach (RenderedPiece p in ChessWrapper.Pieces)
 			{
-				if (p.Sprite.Control == e.OriginalSource)
+				if (p.Sprite.ActualBounds.Contains(e.GetPositionV()))
 				{
 					ChessWrapper.GrabPiece(p, e);
 					break;

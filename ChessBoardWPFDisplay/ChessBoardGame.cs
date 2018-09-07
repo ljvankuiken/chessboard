@@ -30,7 +30,7 @@ namespace ChessBoardWPFDisplay
 		{
 			Scale = 0.5;
 
-			Board = new Sprite(Canvas, "img/qualityboard_1024.png", new Point(50, 50), Scale);
+			Board = new Sprite(Canvas, "img/grayboard_1024.png", new Point(50, 50), Scale);
 			Board.Control.Tag = "\"QUALITY\" CHESS BOARD";
 
 			Sprites.Add(Board);
@@ -91,9 +91,16 @@ namespace ChessBoardWPFDisplay
 				return;
 			}
 
-			Vector2 posCenter = GrabbedPiece.RenderedPos + new Vector2(GrabbedPiece.Sprite.ActualWidth / 2.0, GrabbedPiece.Sprite.ActualHeight / 2.0);
+			Vector2 posCenter = GrabbedPiece.RenderedPos + GrabbedPiece.Sprite.ActualSize / 2.0;
+			(int col, int row) tile = getCoords(posCenter);
+			GrabbedPiece.Piece.Column = tile.col;
+			GrabbedPiece.Piece.Row = tile.row;
+			GrabbedPiece.RenderedPos = new Vector2(tile.col / 8.0 * Board.ActualWidth, (7 - tile.row) / 8.0 * Board.ActualHeight) + Board.Position;
 
 			Panel.SetZIndex(GrabbedPiece.Sprite.Control, 10);
+
+			GrabbedPiece.Refresh();
+
 			GrabbedPiece = null;
 		}
 
@@ -106,6 +113,17 @@ namespace ChessBoardWPFDisplay
 			}
 
 			base.Refresh(e);
+		}
+
+		private (int col, int row) getCoords(Vector2 pos)
+		{
+			Vector2 relPos = pos - Board.Position;
+
+			// No idea why, but there's an off-by-one here.
+			int tx = (int)(relPos.X / Board.ActualWidth * 8.0);
+			int ty = 7 - (int)(relPos.Y / Board.ActualHeight * 8.0);
+
+			return (tx, ty);
 		}
 
 		public override string GetDebugText(MouseEventArgs e)
@@ -123,6 +141,11 @@ namespace ChessBoardWPFDisplay
 			if (GrabbedPiece != null)
 			{
 				lines.Add("Grabbed Piece: " + GrabbedPiece.Piece.ToString());
+
+				Vector2 posCenter = GrabbedPiece.RenderedPos + GrabbedPiece.Sprite.ActualSize / 2.0;
+				(int col, int row) tile = getCoords(posCenter);
+
+				lines.Add("(at " + Util.GetPosAlgebraic(tile.row, tile.col) + ")");
 			}
 
 			string res = "";

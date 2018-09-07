@@ -27,8 +27,12 @@ namespace ChessBoardWPFDisplay
 		public double ActualWidth => Size.X * Scale;
 		public double ActualHeight => Size.Y * Scale;
 
+		public Vector2 ActualSize => new Vector2(ActualWidth, ActualHeight);
+
 		public double Scale
 		{ get; set; }
+
+		public AABB ActualBounds => new AABB(Position, ActualSize);
 
 		public Sprite(Canvas canvas, string path, Vector2 pos, double scale = 1.0, BitmapScalingMode scaling = BitmapScalingMode.NearestNeighbor)
 		{
