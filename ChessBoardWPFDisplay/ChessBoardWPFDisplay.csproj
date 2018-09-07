@@ -59,7 +59,6 @@
     <Compile Include="DisplayUtil.cs" />
     <Compile Include="RenderedPiece.cs" />
     <Compile Include="Sprite.cs" />
-    <Compile Include="Vector2.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

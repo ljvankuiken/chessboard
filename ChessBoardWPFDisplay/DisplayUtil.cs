@@ -9,12 +9,12 @@ namespace ChessBoardWPFDisplay
 {
     public static class DisplayUtil
     {
-		public static Vector2 ToVector2(this Point point)
+		public static Vector ToVector(this Point point)
 		{
-			return new Vector2(point.X, point.Y);
+			return new Vector(point.X, point.Y);
 		}
 
-		public static Point ToPoint(this Vector2 v)
+		public static Point ToPoint(this Vector v)
 		{
 			return new Point(v.X, v.Y);
 		}

@@ -23,14 +23,14 @@ namespace ChessBoardWPFDisplay
 		public RenderedPiece GrabbedPiece
 		{ get; set; }
 
-		public Vector2 GrabOffset
+		public Point GrabOffset
 		{ get; set; }
 
 		public ChessBoardGame(Canvas control) : base(control)
 		{
 			Scale = 0.5;
 
-			Board = new Sprite(Canvas, "img/shittyboard_1024.png", new Vector2(50), Scale);
+			Board = new Sprite(Canvas, "img/shittyboard_1024.png", new Point(50, 50), Scale);
 			Board.Control.Tag = "SHITTY CHESS BOARD";
 
 			Sprites.Add(Board);
@@ -80,10 +80,10 @@ namespace ChessBoardWPFDisplay
 		public void GrabPiece(RenderedPiece piece, MouseButtonEventArgs e)
 		{
 			GrabbedPiece = piece;
-			GrabOffset = e.GetPosition(piece.Sprite.Control).ToVector2();
+			GrabOffset = e.GetPosition(piece.Sprite.Control);
 		}
 
-		public void DropPiece(Vector2 boardPos)
+		public void DropPiece(Point boardPos)
 		{
 			GrabbedPiece = null;
 		}
@@ -92,7 +92,7 @@ namespace ChessBoardWPFDisplay
 		{
 			if (GrabbedPiece != null)
 			{
-				GrabbedPiece.RenderedPos = e.GetPosition(null).ToVector2() - GrabOffset;
+				GrabbedPiece.RenderedPos = (e.GetPosition(null) - GrabOffset).ToPoint();
 				GrabbedPiece.Refresh();
 			}
 

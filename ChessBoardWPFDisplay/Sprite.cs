@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -14,10 +15,10 @@ namespace ChessBoardWPFDisplay
 		public Image Control
 		{ get; set; }
 
-		public Vector2 Position
+		public Point Position
 		{ get; set; }
 
-		public Vector2 Size
+		public Point Size
 		{ get; private set; }
 
 		public double Width => Size.X;
@@ -29,7 +30,7 @@ namespace ChessBoardWPFDisplay
 		public double Scale
 		{ get; set; }
 
-		public Sprite(Canvas canvas, string path, Vector2 pos, double scale = 1.0, BitmapScalingMode scaling = BitmapScalingMode.NearestNeighbor)
+		public Sprite(Canvas canvas, string path, Point pos, double scale = 1.0, BitmapScalingMode scaling = BitmapScalingMode.NearestNeighbor)
 		{
 			Uri uri = new Uri("pack://application:,,,/" + path);
 			BitmapImage bmp = new BitmapImage(uri);
@@ -44,7 +45,7 @@ namespace ChessBoardWPFDisplay
 
 			Position = pos;
 			Scale = scale;
-			Size = new Vector2(bmp.PixelWidth, bmp.PixelHeight);
+			Size = new Point(bmp.PixelWidth, bmp.PixelHeight);
 		}
 
 		public virtual void Initialize()

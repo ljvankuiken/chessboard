@@ -69,7 +69,7 @@ namespace ChessBoardWPFDisplay
 
 		private void Window_MouseUp(object sender, MouseButtonEventArgs e)
 		{
-			ChessWrapper.DropPiece(e.GetPosition(ChessWrapper.Board.Control).ToVector2());
+			ChessWrapper.DropPiece(e.GetPosition(ChessWrapper.Board.Control));
 		}
 	}
 }

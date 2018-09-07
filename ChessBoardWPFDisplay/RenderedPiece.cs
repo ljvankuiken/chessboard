@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using ChessBoard;
 
@@ -13,7 +14,7 @@ namespace ChessBoardWPFDisplay
 		public Piece Piece
 		{ get; private set; }
 
-		public Vector2 RenderedPos
+		public Point RenderedPos
 		{ get; set; }
 
 		public Sprite Sprite
@@ -29,7 +30,7 @@ namespace ChessBoardWPFDisplay
 			
 			double y = ((7 - row) / 8.0 * BoardSprite.ActualHeight) + BoardSprite.Position.Y;
 			double x = (col / 8.0 * BoardSprite.ActualWidth) + BoardSprite.Position.X;
-			RenderedPos = new Vector2(x, y);
+			RenderedPos = new Point(x, y);
 
 			string path = "img/shittypieces/" + type.ToString().ToLower() + "_" + side.ToString().ToLower() + ".png";
 			Sprite = new Sprite(canvas, path, RenderedPos, BoardSprite.Scale);
