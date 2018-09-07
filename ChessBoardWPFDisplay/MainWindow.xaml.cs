@@ -20,6 +20,8 @@ namespace ChessBoardWPFDisplay
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		public readonly CanvasGame GameWrapper;
+
 		public MainWindow()
 		{
 			InitializeComponent();

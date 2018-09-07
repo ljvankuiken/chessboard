@@ -55,6 +55,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Sprite.cs" />
+    <Compile Include="Vector2.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -63,6 +65,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CanvasGame.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -106,6 +109,19 @@
     <Resource Include="img\shittypieces\queen_white.png" />
     <Resource Include="img\shittypieces\rook_black.png" />
     <Resource Include="img\shittypieces\rook_white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ChessBoard\ChessBoard.csproj">
+      <Project>{7289f285-b1aa-4eff-86c5-6a2d5a729b47}</Project>
+      <Name>ChessBoard</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\simpleboard.png" />
+    <Resource Include="img\grayboard_1024.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\shittyboard_1024.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
