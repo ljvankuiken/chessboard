@@ -24,8 +24,6 @@ namespace ChessBoard
 	/// </summary>
 	public class Piece
 	{
-		internal const int MAX_ROW = 7;
-
 		/// <summary>
 		/// The zero-indexed column value for the piece's position. 0-7 are valid.
 		/// </summary>
@@ -54,13 +52,13 @@ namespace ChessBoard
 		/// <summary>
 		/// Returns the chess notation position for this piece (e.g., "e5").
 		/// </summary>
-		public string ChessPos => Util.GetChessPos(Row, Column);
+		public string ChessPos => Util.GetPosAlgebraic(Row, Column);
 
 		/// <summary>
 		/// Returns whether this piece has moved.
 		/// Meaningless if Type != PieceType.Pawn, but otherwise still usable.
 		/// </summary>
-		public bool HasPawnMoved => (Side == Side.White && Row != 1) || (Side == Side.Black && Row != MAX_ROW - 1);
+		public bool HasPawnMoved => (Side == Side.White && Row != 1) || (Side == Side.Black && Row != 6);
 
 		public Piece(PieceType type, Side side, int col, int row)
 		{
@@ -70,13 +68,18 @@ namespace ChessBoard
 			Side = side;
 		}
 
-		public void Promote()
+		public void Promote(PieceType promotedTo)
 		{
+			if (promotedTo == PieceType.King)
+			{
+				throw new ArgumentException("Pawns cannot be promoted to kings.");
+			}
+
 			if (Type == PieceType.Pawn)
 			{
-				if ((Side == Side.White && Row == MAX_ROW) || (Side == Side.Black && Row == 0))
+				if ((Side == Side.White && Row == 7) || (Side == Side.Black && Row == 0))
 				{
-					Type = PieceType.Queen;
+					Type = promotedTo;
 				}
 			}
 		}

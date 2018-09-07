@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace ChessBoardWPFDisplay
 {
@@ -23,9 +24,7 @@ namespace ChessBoardWPFDisplay
 		}
 
 		public virtual void Initialize(RoutedEventArgs e)
-		{
-
-		}
+		{ }
 
 		public void Refresh()
 		{
@@ -34,5 +33,10 @@ namespace ChessBoardWPFDisplay
 				sprite.Update();
 			}
 		}
+
+		public virtual string GetDebugText(MouseEventArgs e) => "";
+
+		public virtual void OnMouseMove(MouseEventArgs e)
+		{ }
     }
 }

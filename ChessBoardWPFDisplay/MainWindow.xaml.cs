@@ -33,14 +33,28 @@ namespace ChessBoardWPFDisplay
 			GameWrapper.Initialize(e);
 		}
 
-		// For some reason this only procs when an object within the canvas is clicked, not the canvas itself.
+		// For some reason Canvas events only proc from elements within the Canvas, but not from the Canvas itself.
 		private void GameCanvas_MouseDown(object sender, MouseButtonEventArgs e)
 		{
+			string msgTxt = "You clicked a canvas thing: ";
+
 			if (e.OriginalSource is FrameworkElement)
 			{
 				FrameworkElement el = e.OriginalSource as FrameworkElement;
-				MessageBox.Show("You clicked a thing: " + el.Tag.ToString());
+				msgTxt += el.Tag.ToString() + "\n";
 			}
+
+			Point posRel = e.GetPosition(GameWrapper.Board.Control);
+			msgTxt += "X: " + posRel.X.ToString() + " Y: " + posRel.Y.ToString();
+
+			MessageBox.Show(msgTxt);
+		}
+
+		private void Window_MouseMove(object sender, MouseEventArgs e)
+		{
+			GameWrapper.Refresh();
+
+			DebugTxt.Text = GameWrapper.GetDebugText(e);
 		}
 	}
 }

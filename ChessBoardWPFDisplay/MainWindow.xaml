@@ -5,11 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChessBoardWPFDisplay"
         mc:Ignorable="d"
-        Title="Shitty Chess" Height="650" Width="900" Loaded="Window_Loaded">
+        Title="Kinda Sorta Chess" 
+        Height="650" Width="900"
+        Background="#FFFFFFFF"
+        Loaded="Window_Loaded" MouseMove="Window_MouseMove">
   <Grid>
     <Canvas x:Name="GameCanvas"
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch"
-            MouseDown="GameCanvas_MouseDown" />
+            MouseDown="GameCanvas_MouseDown">
+      <TextBlock x:Name="DebugTxt"
+                 Text="DEBUG"
+                 Canvas.Top="10"
+                 Canvas.Right="10"
+                 TextAlignment="Right"
+                 FontFamily="Consolas" />
+    </Canvas>
   </Grid>
 </Window>

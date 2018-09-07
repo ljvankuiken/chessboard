@@ -62,6 +62,11 @@ namespace ChessBoardWPFDisplay
 			return X.GetHashCode() ^ Y.GetHashCode();
 		}
 
+		public override string ToString()
+		{
+			return "(" + X.ToString() + ", " + Y.ToString() + ")";
+		}
+
 		public static Vector2 operator+(Vector2 a, Vector2 b)
 		{
 			return new Vector2(a.X + b.X, a.Y + b.Y);

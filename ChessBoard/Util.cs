@@ -20,12 +20,28 @@ namespace ChessBoard
 			}
 		}
 
-		public static string GetChessPos(int row, int col)
+		public static string GetPosAlgebraic(int row, int col)
 		{
 			const string LETTERS = "abcdefgh";
 			char colChar = LETTERS[col];
 
 			return colChar.ToString() + (row + 1).ToString();
+		}
+
+		public static string GetPosDescriptive(int row, int col, Side side = Side.White)
+		{
+			string[] COLUMNS = new string[] { "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR" };
+
+			string colStr = COLUMNS[col];
+
+			int relRow = (side == Side.White ? row : 7 - row) + 1;
+
+			return colStr + relRow.ToString();
+		}
+
+		public static string GetPosICCF(int row, int col)
+		{
+			return (col + 1).ToString() + (row + 1).ToString();
 		}
 	}
 }
