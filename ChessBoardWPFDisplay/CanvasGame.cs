@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace ChessBoardWPFDisplay
@@ -21,11 +22,16 @@ namespace ChessBoardWPFDisplay
 			Sprites = new List<Sprite>();
 		}
 
+		public virtual void Initialize(RoutedEventArgs e)
+		{
+
+		}
+
 		public void Refresh()
 		{
 			foreach (Sprite sprite in Sprites)
 			{
-
+				sprite.Update();
 			}
 		}
     }

@@ -23,11 +23,7 @@ namespace ChessBoardWPFDisplay
 		public double Scale
 		{ get; set; }
 
-		static Sprite()
-		{
-		}
-
-		public Sprite(string path, Vector2 pos, double scale = 1.0)
+		public Sprite(Canvas canvas, string path, Vector2 pos, double scale = 1.0, BitmapScalingMode scaling = BitmapScalingMode.NearestNeighbor)
 		{
 			Uri uri = new Uri("pack://application:,,,/" + path);
 			BitmapImage bmp = new BitmapImage(uri);
@@ -36,15 +32,21 @@ namespace ChessBoardWPFDisplay
 				Source = bmp,
 				Stretch = Stretch.Uniform,
 			};
+			canvas.Children.Add(Control);
 
-			RenderOptions.SetBitmapScalingMode(Control, BitmapScalingMode.NearestNeighbor);
+			RenderOptions.SetBitmapScalingMode(Control, scaling);
 
 			Position = pos;
 			Scale = scale;
 			Size = new Vector2(bmp.PixelWidth, bmp.PixelHeight);
 		}
 
-		public void Update(Canvas canvas)
+		public virtual void Initialize()
+		{
+			Update();
+		}
+
+		public virtual void Update()
 		{
 			Canvas.SetLeft(Control, Position.X);
 			Canvas.SetTop(Control, Position.Y);

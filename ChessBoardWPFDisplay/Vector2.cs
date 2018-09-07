@@ -29,6 +29,12 @@ namespace ChessBoardWPFDisplay
 			Y = y;
 		}
 
+		public Vector2(double xy)
+		{
+			X = xy;
+			Y = xy;
+		}
+
 		public double DistanceTo(Vector2 other)
 		{
 			double dx = X - other.X;

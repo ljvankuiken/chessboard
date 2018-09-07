@@ -20,11 +20,27 @@ namespace ChessBoardWPFDisplay
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		public readonly CanvasGame GameWrapper;
+		public readonly ChessBoardGame GameWrapper;
 
 		public MainWindow()
 		{
 			InitializeComponent();
+			GameWrapper = new ChessBoardGame(GameCanvas);
+		}
+
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+		{
+			GameWrapper.Initialize(e);
+		}
+
+		// For some reason this only procs when an object within the canvas is clicked, not the canvas itself.
+		private void GameCanvas_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (e.OriginalSource is FrameworkElement)
+			{
+				FrameworkElement el = e.OriginalSource as FrameworkElement;
+				MessageBox.Show("You clicked a thing: " + el.Tag.ToString());
+			}
 		}
 	}
 }
