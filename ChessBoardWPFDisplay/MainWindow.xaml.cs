@@ -41,7 +41,7 @@ namespace ChessBoardWPFDisplay
 			if (e.OriginalSource is FrameworkElement)
 			{
 				FrameworkElement el = e.OriginalSource as FrameworkElement;
-				msgTxt += el.Tag.ToString() + "\n";
+				msgTxt += el.Tag?.ToString() + "\n";
 			}
 
 			Point posRel = e.GetPosition(GameWrapper.Board.Control);

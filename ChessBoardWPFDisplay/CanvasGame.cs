@@ -13,14 +13,11 @@ namespace ChessBoardWPFDisplay
     {
 		public readonly Canvas Canvas;
 
-		public List<Sprite> Sprites
-		{ get; private set; }
+		public List<Sprite> Sprites = new List<Sprite>();
 
 		public CanvasGame(Canvas canvas)
 		{
 			Canvas = canvas;
-
-			Sprites = new List<Sprite>();
 		}
 
 		public virtual void Initialize(RoutedEventArgs e)

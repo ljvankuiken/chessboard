@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ChessBoard
 {
 	/// <summary>
-	/// The particular type of piece on (or off of) the board. Movement, game status, and verification regarding pieces all stem from this type.
+	/// The particular type of piece on (or off of) the board.
 	/// </summary>
 	public enum PieceType
 	{
@@ -82,6 +82,11 @@ namespace ChessBoard
 					Type = promotedTo;
 				}
 			}
+		}
+
+		public override string ToString()
+		{
+			return Side.ToString() + " " + Type.ToString() + " at " + ChessPos;
 		}
 	}
 }

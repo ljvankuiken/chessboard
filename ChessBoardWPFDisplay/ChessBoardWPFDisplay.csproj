@@ -57,6 +57,7 @@
     </ApplicationDefinition>
     <Compile Include="ChessBoardGame.cs" />
     <Compile Include="DisplayUtil.cs" />
+    <Compile Include="RenderedPiece.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="Vector2.cs" />
     <Page Include="MainWindow.xaml">
@@ -124,6 +125,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="img\shittyboard_1024.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\shittypieces\king_white.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
