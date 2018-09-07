@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace ChessBoardWPFDisplay
@@ -23,6 +24,12 @@ namespace ChessBoardWPFDisplay
 		public static Vector2 GetPositionV(this MouseEventArgs e, IInputElement relativeTo = null)
 		{
 			return e.GetPosition(relativeTo);
+		}
+
+		public static void SetPos(this UIElement element, Vector2 pos)
+		{
+			Canvas.SetLeft(element, pos.X);
+			Canvas.SetTop(element, pos.Y);
 		}
     }
 }

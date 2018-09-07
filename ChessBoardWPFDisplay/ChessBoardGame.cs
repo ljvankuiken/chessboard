@@ -26,11 +26,26 @@ namespace ChessBoardWPFDisplay
 		public Vector2 GrabOffset
 		{ get; set; }
 
+		public bool DebugMode
+		{
+			get => _debugMode;
+			set
+			{
+				foreach (RenderedPiece rp in Pieces)
+				{
+					rp.ShowDebug = value;
+					rp.Refresh();
+				}
+				_debugMode = value;
+			}
+		}
+		private bool _debugMode;
+
 		public ChessBoardGame(Canvas control) : base(control)
 		{
 			Scale = 0.5;
 
-			Board = new Sprite(Canvas, "img/grayboard_1024.png", new Point(50, 50), Scale);
+			Board = new Sprite(Canvas, "img/qualityboard_1024.png", new Point(50, 50), Scale);
 			Board.Control.Tag = "\"QUALITY\" CHESS BOARD";
 
 			Sprites.Add(Board);

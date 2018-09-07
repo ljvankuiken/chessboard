@@ -59,8 +59,7 @@ namespace ChessBoardWPFDisplay
 
 		public virtual void Refresh()
 		{
-			Canvas.SetLeft(Control, Position.X);
-			Canvas.SetTop(Control, Position.Y);
+			Control.SetPos(Position);
 
 			Control.Width = Size.X * Scale;
 			Control.Height = Size.Y * Scale;

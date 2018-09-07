@@ -57,5 +57,13 @@ namespace ChessBoardWPFDisplay
 		{
 			ChessWrapper.DropPiece(e.GetPosition(ChessWrapper.Board.Control));
 		}
+
+		private void Window_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.F3)
+			{
+				ChessWrapper.DebugMode = !ChessWrapper.DebugMode;
+			}
+		}
 	}
 }

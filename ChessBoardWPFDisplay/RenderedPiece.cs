@@ -25,7 +25,11 @@ namespace ChessBoardWPFDisplay
 		public Sprite BoardSprite
 		{ get; private set; }
 
-		private Ellipse _centerDot;
+		private readonly Ellipse _centerDot;
+		private readonly Rectangle _boundingBox;
+
+		public bool ShowDebug
+		{ get; set; }
 
 		public RenderedPiece(PieceType type, Side side, int col, int row, Sprite board, Canvas canvas)
 		{
@@ -44,13 +48,25 @@ namespace ChessBoardWPFDisplay
 			_centerDot = new Ellipse() {
 				Width = 10,
 				Height = 10,
-				Fill = new SolidColorBrush(Colors.Red)
+				Fill = new SolidColorBrush(Colors.Red),
+				Opacity = 0
 			};
 			Vector2 dotPos = RenderedPos + (Sprite.ActualSize / 2.0) - new Vector2(5);
-			Canvas.SetLeft(_centerDot, dotPos.X);
-			Canvas.SetTop(_centerDot, dotPos.Y);
+			_centerDot.SetPos(dotPos);
 			Panel.SetZIndex(_centerDot, 10000);
 			canvas.Children.Add(_centerDot);
+
+			_boundingBox = new Rectangle() {
+				Width = Sprite.ActualWidth,
+				Height = Sprite.ActualHeight,
+				Fill = new SolidColorBrush(Colors.Goldenrod),
+				StrokeThickness = 2,
+				Stroke = new SolidColorBrush(Colors.Black),
+				Opacity = 0
+			};
+			_boundingBox.SetPos(RenderedPos);
+			Panel.SetZIndex(_boundingBox, 9999);
+			canvas.Children.Add(_boundingBox);
 		}
 
 		public void Initialize()
@@ -63,9 +79,12 @@ namespace ChessBoardWPFDisplay
 			Sprite.Position = RenderedPos;
 			Sprite.Refresh();
 
+			_centerDot.Opacity = ShowDebug ? 1 : 0;
 			Vector2 dotPos = RenderedPos + (Sprite.ActualSize / 2.0) - new Vector2(5);
-			Canvas.SetLeft(_centerDot, dotPos.X);
-			Canvas.SetTop(_centerDot, dotPos.Y);
+			_centerDot.SetPos(dotPos);
+
+			_boundingBox.Opacity = ShowDebug ? 0.3 : 0;
+			_boundingBox.SetPos(RenderedPos);
 		}
     }
 }

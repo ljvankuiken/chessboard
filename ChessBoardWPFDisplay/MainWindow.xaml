@@ -10,7 +10,8 @@
         Background="#FFFFFFFF"
         Loaded="Window_Loaded" 
         MouseMove="Window_MouseMove"
-        MouseUp="Window_MouseUp">
+        MouseUp="Window_MouseUp"
+        KeyDown="Window_KeyDown">
   <Grid>
     <Canvas x:Name="GameCanvas"
             VerticalAlignment="Stretch"
