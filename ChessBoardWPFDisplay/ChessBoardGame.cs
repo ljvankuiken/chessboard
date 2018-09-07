@@ -23,7 +23,7 @@ namespace ChessBoardWPFDisplay
 		public RenderedPiece GrabbedPiece
 		{ get; set; }
 
-		public Point GrabOffset
+		public Vector2 GrabOffset
 		{ get; set; }
 
 		public ChessBoardGame(Canvas control) : base(control)
@@ -91,6 +91,8 @@ namespace ChessBoardWPFDisplay
 				return;
 			}
 
+			Vector2 posCenter = GrabbedPiece.RenderedPos + new Vector2(GrabbedPiece.Sprite.ActualWidth / 2.0, GrabbedPiece.Sprite.ActualHeight / 2.0);
+
 			Panel.SetZIndex(GrabbedPiece.Sprite.Control, 10);
 			GrabbedPiece = null;
 		}
@@ -99,7 +101,7 @@ namespace ChessBoardWPFDisplay
 		{
 			if (GrabbedPiece != null)
 			{
-				GrabbedPiece.RenderedPos = (e.GetPosition(null) - GrabOffset).ToPoint();
+				GrabbedPiece.RenderedPos = e.GetPositionV() - GrabOffset;
 				GrabbedPiece.Refresh();
 			}
 
@@ -110,7 +112,7 @@ namespace ChessBoardWPFDisplay
 		{
 			List<string> lines = new List<string>();
 
-			Point posRel = e.GetPosition(Board.Control);
+			Vector2 posRel = e.GetPosition(Board.Control);
 			lines.Add("Board coords: " + posRel.ToString());
 
 			int tileX = Math.Min((int)(posRel.X / Board.ActualWidth * 8), 7);

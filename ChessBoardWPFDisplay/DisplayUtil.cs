@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace ChessBoardWPFDisplay
 {
@@ -17,6 +18,11 @@ namespace ChessBoardWPFDisplay
 		public static Point ToPoint(this Vector v)
 		{
 			return new Point(v.X, v.Y);
+		}
+
+		public static Vector2 GetPositionV(this MouseEventArgs e, IInputElement relativeTo = null)
+		{
+			return e.GetPosition(relativeTo);
 		}
     }
 }

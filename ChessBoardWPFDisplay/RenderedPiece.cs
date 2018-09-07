@@ -32,7 +32,7 @@ namespace ChessBoardWPFDisplay
 			double x = (col / 8.0 * BoardSprite.ActualWidth) + BoardSprite.Position.X;
 			RenderedPos = new Point(x, y);
 
-			string path = "img/shittypieces/" + type.ToString().ToLower() + "_" + side.ToString().ToLower() + ".png";
+			string path = "img/qualitypieces/" + type.ToString().ToLower() + "_" + side.ToString().ToLower() + ".png";
 			Sprite = new Sprite(canvas, path, RenderedPos, BoardSprite.Scale);
 			Sprite.Control.Tag = Piece.ToString();
 			Panel.SetZIndex(Sprite.Control, 10);

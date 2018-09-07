@@ -15,10 +15,10 @@ namespace ChessBoardWPFDisplay
 		public Image Control
 		{ get; set; }
 
-		public Point Position
+		public Vector2 Position
 		{ get; set; }
 
-		public Point Size
+		public Vector2 Size
 		{ get; private set; }
 
 		public double Width => Size.X;
@@ -30,7 +30,7 @@ namespace ChessBoardWPFDisplay
 		public double Scale
 		{ get; set; }
 
-		public Sprite(Canvas canvas, string path, Point pos, double scale = 1.0, BitmapScalingMode scaling = BitmapScalingMode.NearestNeighbor)
+		public Sprite(Canvas canvas, string path, Vector2 pos, double scale = 1.0, BitmapScalingMode scaling = BitmapScalingMode.NearestNeighbor)
 		{
 			Uri uri = new Uri("pack://application:,,,/" + path);
 			BitmapImage bmp = new BitmapImage(uri);
@@ -45,7 +45,7 @@ namespace ChessBoardWPFDisplay
 
 			Position = pos;
 			Scale = scale;
-			Size = new Point(bmp.PixelWidth, bmp.PixelHeight);
+			Size = new Vector2(bmp.PixelWidth, bmp.PixelHeight);
 		}
 
 		public virtual void Initialize()
