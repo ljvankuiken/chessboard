@@ -20,6 +20,12 @@ namespace ChessBoardWPFDisplay
 
 		public readonly List<RenderedPiece> Pieces = new List<RenderedPiece>();
 
+		public RenderedPiece GrabbedPiece
+		{ get; set; }
+
+		public Vector2 GrabOffset
+		{ get; set; }
+
 		public ChessBoardGame(Canvas control) : base(control)
 		{
 			Scale = 0.5;
@@ -44,7 +50,7 @@ namespace ChessBoardWPFDisplay
 			base.Initialize(e);
 		}
 
-		private void SetUpPieces()
+		public void SetUpPieces()
 		{
 			for (int i = 0; i < 8; i++)
 			{
@@ -71,17 +77,50 @@ namespace ChessBoardWPFDisplay
 			Pieces.Add(new RenderedPiece(PieceType.Rook, Side.Black, 7, 7, Board, Canvas));
 		}
 
+		public void GrabPiece(RenderedPiece piece, MouseButtonEventArgs e)
+		{
+			GrabbedPiece = piece;
+			GrabOffset = e.GetPosition(piece.Sprite.Control).ToVector2();
+		}
+
+		public void DropPiece(Vector2 boardPos)
+		{
+			GrabbedPiece = null;
+		}
+
+		public override void Refresh(MouseEventArgs e)
+		{
+			if (GrabbedPiece != null)
+			{
+				GrabbedPiece.RenderedPos = e.GetPosition(null).ToVector2() - GrabOffset;
+				GrabbedPiece.Refresh();
+			}
+
+			base.Refresh(e);
+		}
+
 		public override string GetDebugText(MouseEventArgs e)
 		{
-			string res = "";
+			List<string> lines = new List<string>();
 
 			Point posRel = e.GetPosition(Board.Control);
-			res += "Board coords: " + posRel.ToString() + "\n";
+			lines.Add("Board coords: " + posRel.ToString());
 
 			int tileX = Math.Min((int)(posRel.X / Board.ActualWidth * 8), 7);
 			int tileY = 7 - Math.Min((int)(posRel.Y / Board.ActualHeight * 8), 7);
 
-			res += "Tile: " + Util.GetPosAlgebraic(tileY, tileX);
+			lines.Add("Tile: " + Util.GetPosAlgebraic(tileY, tileX));
+
+			if (GrabbedPiece != null)
+			{
+				lines.Add("Grabbed Piece: " + GrabbedPiece.Piece.ToString());
+			}
+
+			string res = "";
+			foreach (string l in lines)
+			{
+				res += l + "\n";
+			}
 
 			return res;
 		}

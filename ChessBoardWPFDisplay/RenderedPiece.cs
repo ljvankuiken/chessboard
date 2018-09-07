@@ -34,11 +34,18 @@ namespace ChessBoardWPFDisplay
 			string path = "img/shittypieces/" + type.ToString().ToLower() + "_" + side.ToString().ToLower() + ".png";
 			Sprite = new Sprite(canvas, path, RenderedPos, BoardSprite.Scale);
 			Sprite.Control.Tag = Piece.ToString();
+			Panel.SetZIndex(Sprite.Control, 10);
 		}
 
 		public void Initialize()
 		{
 			Sprite.Initialize();
+		}
+
+		public void Refresh()
+		{
+			Sprite.Position = RenderedPos;
+			Sprite.Refresh();
 		}
     }
 }

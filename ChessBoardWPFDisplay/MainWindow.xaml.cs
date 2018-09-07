@@ -20,17 +20,17 @@ namespace ChessBoardWPFDisplay
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		public readonly ChessBoardGame GameWrapper;
+		public readonly ChessBoardGame ChessWrapper;
 
 		public MainWindow()
 		{
 			InitializeComponent();
-			GameWrapper = new ChessBoardGame(GameCanvas);
+			ChessWrapper = new ChessBoardGame(GameCanvas);
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			GameWrapper.Initialize(e);
+			ChessWrapper.Initialize(e);
 		}
 
 		// For some reason Canvas events only proc from elements within the Canvas, but not from the Canvas itself.
@@ -44,17 +44,32 @@ namespace ChessBoardWPFDisplay
 				msgTxt += el.Tag?.ToString() + "\n";
 			}
 
-			Point posRel = e.GetPosition(GameWrapper.Board.Control);
+			Point posRel = e.GetPosition(ChessWrapper.Board.Control);
 			msgTxt += "X: " + posRel.X.ToString() + " Y: " + posRel.Y.ToString();
 
-			MessageBox.Show(msgTxt);
+			//MessageBox.Show(msgTxt);
+
+			foreach (RenderedPiece p in ChessWrapper.Pieces)
+			{
+				if (p.Sprite.Control == e.OriginalSource)
+				{
+					//MessageBox.Show("You clicked a piece: " + p.Piece.ToString());
+					ChessWrapper.GrabPiece(p, e);
+					break;
+				}
+			}
 		}
 
 		private void Window_MouseMove(object sender, MouseEventArgs e)
 		{
-			GameWrapper.Refresh();
+			ChessWrapper.Refresh(e);
 
-			DebugTxt.Text = GameWrapper.GetDebugText(e);
+			DebugTxt.Text = ChessWrapper.GetDebugText(e);
+		}
+
+		private void Window_MouseUp(object sender, MouseButtonEventArgs e)
+		{
+			ChessWrapper.DropPiece(e.GetPosition(ChessWrapper.Board.Control).ToVector2());
 		}
 	}
 }

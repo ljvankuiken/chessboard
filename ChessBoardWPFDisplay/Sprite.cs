@@ -49,10 +49,10 @@ namespace ChessBoardWPFDisplay
 
 		public virtual void Initialize()
 		{
-			Update();
+			Refresh();
 		}
 
-		public virtual void Update()
+		public virtual void Refresh()
 		{
 			Canvas.SetLeft(Control, Position.X);
 			Canvas.SetTop(Control, Position.Y);

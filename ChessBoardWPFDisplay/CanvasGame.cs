@@ -23,17 +23,14 @@ namespace ChessBoardWPFDisplay
 		public virtual void Initialize(RoutedEventArgs e)
 		{ }
 
-		public void Refresh()
+		public virtual void Refresh(MouseEventArgs e)
 		{
 			foreach (Sprite sprite in Sprites)
 			{
-				sprite.Update();
+				sprite.Refresh();
 			}
 		}
 
 		public virtual string GetDebugText(MouseEventArgs e) => "";
-
-		public virtual void OnMouseMove(MouseEventArgs e)
-		{ }
     }
 }

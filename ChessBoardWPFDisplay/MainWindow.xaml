@@ -8,7 +8,9 @@
         Title="Kinda Sorta Chess" 
         Height="650" Width="900"
         Background="#FFFFFFFF"
-        Loaded="Window_Loaded" MouseMove="Window_MouseMove">
+        Loaded="Window_Loaded" 
+        MouseMove="Window_MouseMove"
+        MouseUp="Window_MouseUp">
   <Grid>
     <Canvas x:Name="GameCanvas"
             VerticalAlignment="Stretch"
