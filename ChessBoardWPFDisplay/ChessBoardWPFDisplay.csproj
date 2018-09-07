@@ -100,17 +100,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\shittypieces\bishop_black.png" />
-    <Resource Include="img\shittypieces\bishop_white.png" />
-    <Resource Include="img\shittypieces\king_black.png" />
-    <Resource Include="img\shittypieces\knight_black.png" />
-    <Resource Include="img\shittypieces\knight_white.png" />
-    <Resource Include="img\shittypieces\pawn_black.png" />
-    <Resource Include="img\shittypieces\pawn_white.png" />
-    <Resource Include="img\shittypieces\queen_black.png" />
-    <Resource Include="img\shittypieces\queen_white.png" />
-    <Resource Include="img\shittypieces\rook_black.png" />
-    <Resource Include="img\shittypieces\rook_white.png" />
+    <Resource Include="img\qualitypieces\bishop_black.png" />
+    <Resource Include="img\qualitypieces\bishop_white.png" />
+    <Resource Include="img\qualitypieces\king_black.png" />
+    <Resource Include="img\qualitypieces\knight_black.png" />
+    <Resource Include="img\qualitypieces\knight_white.png" />
+    <Resource Include="img\qualitypieces\pawn_black.png" />
+    <Resource Include="img\qualitypieces\pawn_white.png" />
+    <Resource Include="img\qualitypieces\queen_black.png" />
+    <Resource Include="img\qualitypieces\queen_white.png" />
+    <Resource Include="img\qualitypieces\rook_black.png" />
+    <Resource Include="img\qualitypieces\rook_white.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ChessBoard\ChessBoard.csproj">
@@ -123,10 +123,10 @@
     <Resource Include="img\grayboard_1024.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\shittyboard_1024.png" />
+    <Resource Include="img\qualityboard_1024.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\shittypieces\king_white.png" />
+    <Resource Include="img\qualitypieces\king_white.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

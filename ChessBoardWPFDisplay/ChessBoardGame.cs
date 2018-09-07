@@ -30,8 +30,8 @@ namespace ChessBoardWPFDisplay
 		{
 			Scale = 0.5;
 
-			Board = new Sprite(Canvas, "img/shittyboard_1024.png", new Point(50, 50), Scale);
-			Board.Control.Tag = "SHITTY CHESS BOARD";
+			Board = new Sprite(Canvas, "img/qualityboard_1024.png", new Point(50, 50), Scale);
+			Board.Control.Tag = "\"QUALITY\" CHESS BOARD";
 
 			Sprites.Add(Board);
 
