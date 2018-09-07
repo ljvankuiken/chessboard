@@ -81,10 +81,17 @@ namespace ChessBoardWPFDisplay
 		{
 			GrabbedPiece = piece;
 			GrabOffset = e.GetPosition(piece.Sprite.Control);
+			Panel.SetZIndex(GrabbedPiece.Sprite.Control, 1000);
 		}
 
 		public void DropPiece(Point boardPos)
 		{
+			if (GrabbedPiece == null)
+			{
+				return;
+			}
+
+			Panel.SetZIndex(GrabbedPiece.Sprite.Control, 10);
 			GrabbedPiece = null;
 		}
 
