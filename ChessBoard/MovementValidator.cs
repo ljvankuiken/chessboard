@@ -57,7 +57,7 @@ namespace ChessBoard
 			case PieceType.Rook:
 				return null;
 			case PieceType.Queen:
-				return null;
+				return GetValidQueenLocations(piece);
 			default:
 				throw new ArgumentException("Piece must be from chess.", nameof(piece));
 			}
@@ -80,7 +80,7 @@ namespace ChessBoard
 				{
 					Tile t = new Tile(row, col);
 
-					if (row < 0 || row >= 8 || col < 0 || col >= 8)
+					if (!t.IsValid)
 					{
 						InvalidErrors.Add(t, "OFF BOARD");
 						continue;
@@ -92,7 +92,7 @@ namespace ChessBoard
 						continue;
 					}
 
-					Piece targetPiece = Board[row, col];
+					Piece targetPiece = Board[t];
 					if (targetPiece != null && targetPiece.Side == piece.Side)
 					{
 						InvalidErrors.Add(t, "OCCUPIED");
@@ -104,6 +104,56 @@ namespace ChessBoard
 			}
 
 			_validCache = res;
+			return res;
+		}
+
+		public List<Tile> GetValidQueenLocations(Piece piece)
+		{
+			if (piece.Type != PieceType.Queen)
+			{
+				throw new ArgumentException("Piece must be a queen.", nameof(piece));
+			}
+
+			List<Tile> res = new List<Tile>();
+			Tile[] expandDirs = new Tile[8] {
+				new Tile(-1, -1),
+				new Tile(0, -1),
+				new Tile(1, -1),
+				new Tile(-1, 0),
+				new Tile(1, 0),
+				new Tile(-1, 1),
+				new Tile(0, 1),
+				new Tile(1, 1)
+			};
+
+			for (int d = 0; d < 8; d++)
+			{
+				Tile test = piece.Position + expandDirs[d];
+				while (test.IsValid)
+				{
+					Piece targetPiece = Board[test];
+					if (targetPiece != null)
+					{
+						if (targetPiece.Side != piece.Side)
+						{
+							res.Add(test);
+						}
+						else
+						{
+							InvalidErrors.Add(test, "OCCUPIED");
+						}
+
+						break;
+					}
+					else
+					{
+						res.Add(test);
+					}
+
+					test += expandDirs[d];
+				}
+			}
+
 			return res;
 		}
 	}

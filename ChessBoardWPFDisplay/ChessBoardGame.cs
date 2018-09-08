@@ -128,7 +128,7 @@ namespace ChessBoardWPFDisplay
 			{
 				foreach (RenderedPiece rp in Pieces)
 				{
-					if (rp.Piece.Position == tile)
+					if (rp.Piece.Position == tile && rp != GrabbedPiece)
 					{
 						rp.Disconnect(Canvas);
 					}

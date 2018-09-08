@@ -14,6 +14,8 @@ namespace ChessBoard
 		public int Column
 		{ get; private set; }
 
+		public bool IsValid => Row >= 0 && Row < 8 && Column >= 0 && Column < 8;
+
 		public Tile(int row, int col)
 		{
 			Row = row;
@@ -44,6 +46,15 @@ namespace ChessBoard
 		public override string ToString()
 		{
 			return Util.GetPosAlgebraic(this);
+		}
+
+		public static Tile operator+(Tile a, Tile b)
+		{
+			return new Tile(a.Row + b.Row, a.Column + b.Column);
+		}
+		public static Tile operator-(Tile a, Tile b)
+		{
+			return new Tile(a.Row - b.Row, a.Column - b.Column);
 		}
 
 		public static bool operator==(Tile a, Tile b)
