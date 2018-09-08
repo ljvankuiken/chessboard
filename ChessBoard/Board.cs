@@ -28,7 +28,10 @@ namespace ChessBoard
 				List<Piece> res = new List<Piece>();
 				foreach (Piece p in Layout)
 				{
-					res.Add(p);
+					if (p != null)
+					{
+						res.Add(p);
+					}
 				}
 
 				return res;
@@ -90,16 +93,31 @@ namespace ChessBoard
 			}
 		}
 
-		public void MovePiece(Piece moved, Tile tileTo, bool bypassChecks = true)
+		public void MovePiece(Piece moved, Tile tileTo)
 		{
+			Tile tileFrom = moved.Position;
+
+			// En passant checking
+			Tile diff = tileTo - tileFrom;
+			if (moved.Type == PieceType.Pawn && diff.Abs() == Tile.UnitRC && this[tileTo] == null)
+			{
+				Tile victim = tileFrom + diff.ColumnOnly;
+				this[victim] = null;
+			}
+
 			this[moved.Position] = null;
 			this[tileTo] = moved;
 			moved.Position = tileTo;
 			moved.HasMoved = true;
+
+			foreach (Piece p in Layout)
+			{
+				p?.AfterPieceMoved(moved, tileFrom);
+			}
 		}
-		public void MovePiece(Tile tileFrom, Tile tileTo, bool bypassChecks = true)
+		public void MovePiece(Tile tileFrom, Tile tileTo)
 		{
-			MovePiece(this[tileFrom], tileTo, bypassChecks);
+			MovePiece(this[tileFrom], tileTo);
 		}
     }
 }

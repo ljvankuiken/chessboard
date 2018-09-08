@@ -69,7 +69,7 @@ namespace ChessBoard
 			Side = side;
 		}
 
-		public void Promote(PieceType promotedTo)
+		public void Promote(PieceType promotedTo = PieceType.Queen)
 		{
 			if (promotedTo == PieceType.King)
 			{
@@ -88,6 +88,27 @@ namespace ChessBoard
 		public override string ToString()
 		{
 			return Side.ToString() + " " + Type.ToString() + " at " + ChessPos;
+		}
+
+		public void AfterPieceMoved(Piece mover, Tile fromTile)
+		{
+			if (mover == this)
+			{
+				if (Type == PieceType.Pawn && fromTile.Column == Position.Column &&
+					Math.Abs(fromTile.Row - Position.Row) == 2)
+				{
+					PawnJustMovedDouble = true;
+				}
+			}
+			else if (mover.Side != Side)
+			{
+				PawnJustMovedDouble = false;
+			}
+		}
+
+		public bool EqualsShallow(Piece other)
+		{
+			return Type == other.Type && Side == other.Side && Position == other.Position;
 		}
 	}
 }

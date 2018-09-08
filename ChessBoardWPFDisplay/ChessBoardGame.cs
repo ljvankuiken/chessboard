@@ -124,21 +124,20 @@ namespace ChessBoardWPFDisplay
 
 			List<Tile> valid = Board.Validator.GetValidLocations(GrabbedPiece.Piece);
 
+			Board.MovePiece(GrabbedPiece.Piece, tile);
+
 			if (valid == null || valid.Contains(tile))
 			{
 				for (int i = Pieces.Count - 1; i >= 0; i--)
 				{
 					RenderedPiece rp = Pieces[i];
-
-					if (rp.Piece.Position == tile && rp != GrabbedPiece)
+					if (!Board.Pieces.Exists(p => rp.Piece.EqualsShallow(p)))
 					{
 						rp.Disconnect(Canvas);
 						Pieces.RemoveAt(i);
-						break;
 					}
 				}
 
-				Board.MovePiece(GrabbedPiece.Piece, tile);
 				GrabbedPiece.RenderedPos = getAbsCoords(tile);
 			}
 			else
@@ -199,14 +198,14 @@ namespace ChessBoardWPFDisplay
 			base.Refresh(e);
 		}
 
-		private Tile getTile(Vector2 pos)
+		private Tile getTile(Vector2 posAbs)
 		{
-			Vector2 relPos = pos - BoardSprite.Position;
+			Vector2 relPos = posAbs - BoardSprite.Position;
 			
 			int tx = (int)(relPos.X / BoardSprite.ActualWidth * 8.0);
 			int ty = 7 - (int)(relPos.Y / BoardSprite.ActualHeight * 8.0);
 
-			return new Tile(ty, tx);
+			return new Tile(ty, tx).ClampValid();
 		}
 
 		private Vector2 getAbsCoords(Tile tile)
@@ -218,6 +217,9 @@ namespace ChessBoardWPFDisplay
 		public override string GetDebugText(MouseEventArgs e)
 		{
 			List<string> lines = new List<string>();
+
+			Vector2 posAbs = e.GetPositionV();
+			lines.Add("Abs coords: " + posAbs.ToString());
 
 			Vector2 posRel = e.GetPosition(BoardSprite.Control);
 			lines.Add("Board coords: " + posRel.ToString());
@@ -241,6 +243,25 @@ namespace ChessBoardWPFDisplay
 					lines.Add("(" + Board.Validator.InvalidErrors.GetOrDefault(tile, "INVALID") + ")");
 				}
 			}
+
+			Piece pointedAtPiece = Board[getTile(posAbs)];
+
+			if (pointedAtPiece != null)
+			{
+				lines.Add("Piece: " + pointedAtPiece.Side.ToString() + " " + pointedAtPiece.Type.ToString());
+
+				if (!pointedAtPiece.HasMoved)
+				{
+					lines.Add("Not yet moved");
+				}
+
+				if (pointedAtPiece.Type == PieceType.Pawn && pointedAtPiece.PawnJustMovedDouble)
+				{
+					lines.Add("Open to en passant");
+				}
+			}
+
+			// ---
 
 			string res = "";
 			foreach (string l in lines)

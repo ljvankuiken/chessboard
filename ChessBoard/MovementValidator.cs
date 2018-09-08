@@ -350,11 +350,21 @@ namespace ChessBoard
 			Tile diagonalMinus = piece.Position + new Tile(forward, -1);
 			Tile diagonalPlus = piece.Position + new Tile(forward, 1);
 
+			Tile epMinus = piece.Position + new Tile(0, -1);
+			Tile epPlus = piece.Position + new Tile(0, 1);
+
 			if (diagonalMinus.IsValid)
 			{
 				if (Board[diagonalMinus] == null)
 				{
-					InvalidErrors.Add(diagonalMinus, "EMPTY");
+					if (Board[epMinus] != null && Board[epMinus].Type == PieceType.Pawn && Board[epMinus].PawnJustMovedDouble)
+					{
+						res.Add(diagonalMinus);
+					}
+					else
+					{
+						InvalidErrors.Add(diagonalMinus, "EMPTY");
+					}
 				}
 				else if (Board[diagonalMinus].Side == piece.Side)
 				{
@@ -370,7 +380,14 @@ namespace ChessBoard
 			{
 				if (Board[diagonalPlus] == null)
 				{
-					InvalidErrors.Add(diagonalPlus, "EMPTY");
+					if (Board[epPlus] != null && Board[epPlus].Type == PieceType.Pawn && Board[epPlus].PawnJustMovedDouble)
+					{
+						res.Add(diagonalPlus);
+					}
+					else
+					{
+						InvalidErrors.Add(diagonalPlus, "EMPTY");
+					}
 				}
 				else if (Board[diagonalPlus].Side == piece.Side)
 				{
