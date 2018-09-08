@@ -31,13 +31,13 @@ namespace ChessBoardWPFDisplay
 		public bool ShowDebug
 		{ get; set; }
 
-		public RenderedPiece(PieceType type, Side side, int col, int row, Sprite board, Canvas canvas)
+		public RenderedPiece(PieceType type, Side side, Tile tile, Sprite board, Canvas canvas)
 		{
-			Piece = new Piece(type, side, col, row);
+			Piece = new Piece(type, side, tile);
 			BoardSprite = board;
 			
-			double y = ((7 - row) / 8.0 * BoardSprite.ActualHeight) + BoardSprite.Position.Y;
-			double x = (col / 8.0 * BoardSprite.ActualWidth) + BoardSprite.Position.X;
+			double x = (tile.Column / 8.0 * BoardSprite.ActualWidth) + BoardSprite.Position.X;
+			double y = ((7 - tile.Row) / 8.0 * BoardSprite.ActualHeight) + BoardSprite.Position.Y;
 			RenderedPos = new Vector2(x, y);
 
 			string path = "img/qualitypieces/" + type.ToString().ToLower() + "_" + side.ToString().ToLower() + ".png";

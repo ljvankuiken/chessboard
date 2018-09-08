@@ -27,6 +27,10 @@ namespace ChessBoard
 
 			return colChar.ToString() + Clamp(row + 1, 1, 8).ToString();
 		}
+		public static string GetPosAlgebraic(this Tile tile)
+		{
+			return GetPosAlgebraic(tile.Row, tile.Column);
+		}
 
 		public static string GetPosDescriptive(int row, int col, Side side = Side.White)
 		{
@@ -38,10 +42,18 @@ namespace ChessBoard
 
 			return colStr + relRow.ToString();
 		}
+		public static string GetPosDescriptive(this Tile tile, Side side = Side.White)
+		{
+			return GetPosDescriptive(tile.Row, tile.Column, side);
+		}
 
 		public static string GetPosICCF(int row, int col)
 		{
 			return (col + 1).ToString() + (row + 1).ToString();
+		}
+		public static string GetPosICCF(this Tile tile)
+		{
+			return GetPosICCF(tile.Row, tile.Column);
 		}
 
 		public static int Clamp(int val, int min, int max)

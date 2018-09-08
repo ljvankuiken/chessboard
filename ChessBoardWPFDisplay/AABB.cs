@@ -9,16 +9,16 @@ namespace ChessBoardWPFDisplay
 	public struct AABB : IEquatable<AABB>
 	{
 		public double X
-		{ get; set; }
+		{ get; private set; }
 
 		public double Y
-		{ get; set; }
+		{ get; private set; }
 
 		public double Width
-		{ get; set; }
+		{ get; private set; }
 
 		public double Height
-		{ get; set; }
+		{ get; private set; }
 
 		public Vector2 TopLeft
 		{
@@ -47,13 +47,16 @@ namespace ChessBoardWPFDisplay
 		public AABB(Vector2 topleft, Vector2 size) : this(topleft.X, topleft.Y, size.X, size.Y)
 		{ }
 
-		public bool Equals(AABB other) => throw new NotImplementedException();
+		public bool Equals(AABB other)
+		{
+			return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height;
+		}
 
 		public override bool Equals(object obj)
 		{
-			if (obj is AABB)
+			if (obj is AABB other)
 			{
-				return Equals((AABB)obj);
+				return Equals(other);
 			}
 
 			return false;

@@ -55,7 +55,7 @@ namespace ChessBoardWPFDisplay
 
 		private void Window_MouseUp(object sender, MouseButtonEventArgs e)
 		{
-			ChessWrapper.DropPiece(e.GetPosition(ChessWrapper.Board.Control));
+			ChessWrapper.DropPiece(e.GetPosition(ChessWrapper.BoardSprite.Control));
 		}
 
 		private void Window_KeyDown(object sender, KeyEventArgs e)

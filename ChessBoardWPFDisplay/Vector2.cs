@@ -10,10 +10,10 @@ namespace ChessBoardWPFDisplay
 	public struct Vector2 : IEquatable<Vector2>
 	{
 		public double X
-		{ get; set; }
+		{ get; private set; }
 
 		public double Y
-		{ get; set; }
+		{ get; private set; }
 
 		public static Vector2 Zero => new Vector2(0, 0);
 
@@ -49,9 +49,8 @@ namespace ChessBoardWPFDisplay
 
 		public override bool Equals(object obj)
 		{
-			if (obj is Vector2)
+			if (obj is Vector2 other)
 			{
-				Vector2 other = (Vector2)obj;
 				return X == other.X && Y == other.Y;
 			}
 

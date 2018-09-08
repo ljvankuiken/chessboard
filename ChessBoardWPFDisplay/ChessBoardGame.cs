@@ -12,7 +12,7 @@ namespace ChessBoardWPFDisplay
 {
     public class ChessBoardGame : CanvasGame
     {
-		public Sprite Board
+		public Sprite BoardSprite
 		{ get; private set; }
 
 		public double Scale
@@ -25,6 +25,9 @@ namespace ChessBoardWPFDisplay
 
 		public Vector2 GrabOffset
 		{ get; set; }
+
+		public Board Board
+		{ get; private set; }
 
 		public bool DebugMode
 		{
@@ -45,17 +48,20 @@ namespace ChessBoardWPFDisplay
 		{
 			Scale = 0.5;
 
-			Board = new Sprite(Canvas, "img/qualityboard_1024.png", new Point(50, 50), Scale);
-			Board.Control.Tag = "\"QUALITY\" CHESS BOARD";
+			BoardSprite = new Sprite(Canvas, "img/qualityboard_1024.png", new Point(50, 50), Scale);
+			BoardSprite.Control.Tag = "\"QUALITY\" CHESS BOARD";
 
-			Sprites.Add(Board);
+			Sprites.Add(BoardSprite);
 
-			SetUpPieces();
+			//SetUpPieces();
+			Board = new Board();
+			Board.Reset();
+			SetUpPiecesFromBoard();
 		}
 
 		public override void Initialize(RoutedEventArgs e)
 		{
-			Board.Initialize();
+			BoardSprite.Initialize();
 
 			foreach (RenderedPiece rp in Pieces)
 			{
@@ -65,31 +71,17 @@ namespace ChessBoardWPFDisplay
 			base.Initialize(e);
 		}
 
-		public void SetUpPieces()
+		public void SetUpPiecesFromBoard()
 		{
-			for (int i = 0; i < 8; i++)
+			Pieces.Clear();
+
+			foreach (Piece p in Board.Layout)
 			{
-				Pieces.Add(new RenderedPiece(PieceType.Pawn, Side.White, i, 1, Board, Canvas));
-				Pieces.Add(new RenderedPiece(PieceType.Pawn, Side.Black, i, 6, Board, Canvas));
+				if (p != null)
+				{
+					Pieces.Add(new RenderedPiece(p.Type, p.Side, p.Position, BoardSprite, Canvas));
+				}
 			}
-
-			Pieces.Add(new RenderedPiece(PieceType.Rook, Side.White, 0, 0, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.Knight, Side.White, 1, 0, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.Bishop, Side.White, 2, 0, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.Queen, Side.White, 3, 0, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.King, Side.White, 4, 0, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.Bishop, Side.White, 5, 0, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.Knight, Side.White, 6, 0, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.Rook, Side.White, 7, 0, Board, Canvas));
-
-			Pieces.Add(new RenderedPiece(PieceType.Rook, Side.Black, 0, 7, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.Knight, Side.Black, 1, 7, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.Bishop, Side.Black, 2, 7, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.Queen, Side.Black, 3, 7, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.King, Side.Black, 4, 7, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.Bishop, Side.Black, 5, 7, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.Knight, Side.Black, 6, 7, Board, Canvas));
-			Pieces.Add(new RenderedPiece(PieceType.Rook, Side.Black, 7, 7, Board, Canvas));
 		}
 
 		public void GrabPiece(RenderedPiece piece, MouseButtonEventArgs e)
@@ -107,10 +99,9 @@ namespace ChessBoardWPFDisplay
 			}
 
 			Vector2 posCenter = GrabbedPiece.RenderedPos + GrabbedPiece.Sprite.ActualSize / 2.0;
-			(int col, int row) tile = getCoords(posCenter);
-			GrabbedPiece.Piece.Column = tile.col;
-			GrabbedPiece.Piece.Row = tile.row;
-			GrabbedPiece.RenderedPos = new Vector2(tile.col / 8.0 * Board.ActualWidth, (7 - tile.row) / 8.0 * Board.ActualHeight) + Board.Position;
+			Tile tile = getCoords(posCenter);
+			GrabbedPiece.Piece.Position = tile;
+			GrabbedPiece.RenderedPos = new Vector2(tile.Column / 8.0 * BoardSprite.ActualWidth, (7 - tile.Row) / 8.0 * BoardSprite.ActualHeight) + BoardSprite.Position;
 
 			Panel.SetZIndex(GrabbedPiece.Sprite.Control, 10);
 
@@ -130,26 +121,25 @@ namespace ChessBoardWPFDisplay
 			base.Refresh(e);
 		}
 
-		private (int col, int row) getCoords(Vector2 pos)
+		private Tile getCoords(Vector2 pos)
 		{
-			Vector2 relPos = pos - Board.Position;
+			Vector2 relPos = pos - BoardSprite.Position;
+			
+			int tx = (int)(relPos.X / BoardSprite.ActualWidth * 8.0);
+			int ty = 7 - (int)(relPos.Y / BoardSprite.ActualHeight * 8.0);
 
-			// No idea why, but there's an off-by-one here.
-			int tx = (int)(relPos.X / Board.ActualWidth * 8.0);
-			int ty = 7 - (int)(relPos.Y / Board.ActualHeight * 8.0);
-
-			return (tx, ty);
+			return new Tile(ty, tx);
 		}
 
 		public override string GetDebugText(MouseEventArgs e)
 		{
 			List<string> lines = new List<string>();
 
-			Vector2 posRel = e.GetPosition(Board.Control);
+			Vector2 posRel = e.GetPosition(BoardSprite.Control);
 			lines.Add("Board coords: " + posRel.ToString());
 
-			int tileX = Math.Min((int)(posRel.X / Board.ActualWidth * 8), 7);
-			int tileY = 7 - Math.Min((int)(posRel.Y / Board.ActualHeight * 8), 7);
+			int tileX = Math.Min((int)(posRel.X / BoardSprite.ActualWidth * 8), 7);
+			int tileY = 7 - Math.Min((int)(posRel.Y / BoardSprite.ActualHeight * 8), 7);
 
 			lines.Add("Tile: " + Util.GetPosAlgebraic(tileY, tileX));
 
@@ -158,9 +148,9 @@ namespace ChessBoardWPFDisplay
 				lines.Add("Grabbed Piece: " + GrabbedPiece.Piece.ToString());
 
 				Vector2 posCenter = GrabbedPiece.RenderedPos + GrabbedPiece.Sprite.ActualSize / 2.0;
-				(int col, int row) tile = getCoords(posCenter);
+				Tile tile = getCoords(posCenter);
 
-				lines.Add("(at " + Util.GetPosAlgebraic(tile.row, tile.col) + ")");
+				lines.Add("(at " + tile.GetPosAlgebraic() + ")");
 			}
 
 			string res = "";

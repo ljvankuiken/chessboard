@@ -25,16 +25,9 @@ namespace ChessBoard
 	public class Piece
 	{
 		/// <summary>
-		/// The zero-indexed column value for the piece's position. 0-7 are valid.
+		/// The zero-indexed column and row values for the piece's position. 0-7 are valid within this.
 		/// </summary>
-		public int Column
-		{ get; set; }
-
-		/// <summary>
-		/// The zero-indexed row value for the piece's position. 0-7 are valid.
-		/// Note that this differs by one from standard chess notation, which is one-indexed.
-		/// </summary>
-		public int Row
+		public Tile Position
 		{ get; set; }
 
 		/// <summary>
@@ -52,18 +45,18 @@ namespace ChessBoard
 		/// <summary>
 		/// Returns the chess notation position for this piece (e.g., "e5").
 		/// </summary>
-		public string ChessPos => Util.GetPosAlgebraic(Row, Column);
+		public string ChessPos => Util.GetPosAlgebraic(Position);
 
 		/// <summary>
 		/// Returns whether this piece has moved.
-		/// Meaningless if Type != PieceType.Pawn, but otherwise still usable.
+		/// Used by Pawns, the King, Queen, and Rook for special first movement.
 		/// </summary>
-		public bool HasPawnMoved => (Side == Side.White && Row != 1) || (Side == Side.Black && Row != 6);
+		public bool HasMoved
+		{ get; private set; }
 
-		public Piece(PieceType type, Side side, int col, int row)
+		public Piece(PieceType type, Side side, Tile tile)
 		{
-			Column = col;
-			Row = row;
+			Position = tile;
 			Type = type;
 			Side = side;
 		}
@@ -77,7 +70,7 @@ namespace ChessBoard
 
 			if (Type == PieceType.Pawn)
 			{
-				if ((Side == Side.White && Row == 7) || (Side == Side.Black && Row == 0))
+				if ((Side == Side.White && Position.Row == 7) || (Side == Side.Black && Position.Row == 0))
 				{
 					Type = promotedTo;
 				}
