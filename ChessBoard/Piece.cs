@@ -48,11 +48,19 @@ namespace ChessBoard
 		public string ChessPos => Util.GetPosAlgebraic(Position);
 
 		/// <summary>
-		/// Returns whether this piece has moved.
+		/// Indicates whether this piece has moved.
 		/// Used by Pawns, the King, Queen, and Rook for special first movement.
 		/// </summary>
 		public bool HasMoved
-		{ get; private set; }
+		{ get; set; }
+
+		/// <summary>
+		/// Indicates whether a pawn has just moved double for its first move.
+		/// Needed when checking if en passant capture is possible.
+		/// Meaningless for any other piece.
+		/// </summary>
+		public bool PawnJustMovedDouble
+		{ get; set; }
 
 		public Piece(PieceType type, Side side, Tile tile)
 		{

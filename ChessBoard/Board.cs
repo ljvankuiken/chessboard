@@ -95,6 +95,7 @@ namespace ChessBoard
 			this[moved.Position] = null;
 			this[tileTo] = moved;
 			moved.Position = tileTo;
+			moved.HasMoved = true;
 		}
 		public void MovePiece(Tile tileFrom, Tile tileTo, bool bypassChecks = true)
 		{

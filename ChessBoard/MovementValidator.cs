@@ -49,7 +49,7 @@ namespace ChessBoard
 			case PieceType.King:
 				return GetValidKingLocations(piece);
 			case PieceType.Pawn:
-				return null;
+				return GetValidPawnLocations(piece);
 			case PieceType.Knight:
 				return GetValidKnightLocations(piece);
 			case PieceType.Bishop:
@@ -259,6 +259,7 @@ namespace ChessBoard
 		public List<Tile> GetValidKnightLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.Knight)
+
 			{
 				throw new ArgumentException("Piece must be a knight.", nameof(piece));
 			}
@@ -299,6 +300,88 @@ namespace ChessBoard
 			}
 
 			_validCache = res;
+			return res;
+		}
+
+		public List<Tile> GetValidPawnLocations(Piece piece)
+		{
+			if (piece.Type != PieceType.Pawn)
+			{
+				throw new ArgumentException("Piece must be a pawn.", nameof(piece));
+			}
+
+			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
+
+			List<Tile> res = new List<Tile>();
+
+			int forward = piece.Side == Side.White ? 1 : -1;
+
+			Tile inFront = piece.Position + new Tile(forward, 0);
+			Tile inFrontTwo = piece.Position + new Tile(forward * 2, 0);
+
+			if (!piece.HasMoved && inFrontTwo.IsValid)
+			{
+				if (Board[inFront] != null)
+				{
+					InvalidErrors.Add(inFrontTwo, "BLOCKED");
+				}
+				else if (Board[inFrontTwo] != null)
+				{
+					InvalidErrors.Add(inFrontTwo, "OCCUPIED");
+				}
+				else
+				{
+					res.Add(inFrontTwo);
+				}
+			}
+
+			if (inFront.IsValid)
+			{
+				if (Board[inFront] != null)
+				{
+					InvalidErrors.Add(inFront, "OCCUPIED");
+				}
+				else
+				{
+					res.Add(inFront);
+				}
+			}
+
+			Tile diagonalMinus = piece.Position + new Tile(forward, -1);
+			Tile diagonalPlus = piece.Position + new Tile(forward, 1);
+
+			if (diagonalMinus.IsValid)
+			{
+				if (Board[diagonalMinus] == null)
+				{
+					InvalidErrors.Add(diagonalMinus, "EMPTY");
+				}
+				else if (Board[diagonalMinus].Side == piece.Side)
+				{
+					InvalidErrors.Add(diagonalMinus, "OCCUPIED");
+				}
+				else
+				{
+					res.Add(diagonalMinus);
+				}
+			}
+
+			if (diagonalPlus.IsValid)
+			{
+				if (Board[diagonalPlus] == null)
+				{
+					InvalidErrors.Add(diagonalPlus, "EMPTY");
+				}
+				else if (Board[diagonalPlus].Side == piece.Side)
+				{
+					InvalidErrors.Add(diagonalPlus, "OCCUPIED");
+				}
+				else
+				{
+					res.Add(diagonalPlus);
+				}
+			}
+
 			return res;
 		}
 	}

@@ -49,7 +49,7 @@ namespace ChessBoardWPFDisplay
 			}
 			else if (e.ChangedButton == MouseButton.Right)
 			{
-				MessageBox.Show("Right-clicked: " + e.OriginalSource.ToString());
+				//MessageBox.Show("Right-clicked: " + e.OriginalSource.ToString());
 			}
 		}
 
