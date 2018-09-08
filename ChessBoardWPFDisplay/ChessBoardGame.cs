@@ -126,11 +126,15 @@ namespace ChessBoardWPFDisplay
 
 			if (valid == null || valid.Contains(tile))
 			{
-				foreach (RenderedPiece rp in Pieces)
+				for (int i = Pieces.Count - 1; i >= 0; i--)
 				{
+					RenderedPiece rp = Pieces[i];
+
 					if (rp.Piece.Position == tile && rp != GrabbedPiece)
 					{
 						rp.Disconnect(Canvas);
+						Pieces.RemoveAt(i);
+						break;
 					}
 				}
 

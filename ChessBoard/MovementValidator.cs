@@ -53,9 +53,9 @@ namespace ChessBoard
 			case PieceType.Knight:
 				return null;
 			case PieceType.Bishop:
-				return null;
+				return GetValidBishopLocations(piece);
 			case PieceType.Rook:
-				return null;
+				return GetValidRookLocations(piece);
 			case PieceType.Queen:
 				return GetValidQueenLocations(piece);
 			default:
@@ -114,6 +114,8 @@ namespace ChessBoard
 				throw new ArgumentException("Piece must be a queen.", nameof(piece));
 			}
 
+			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
+
 			List<Tile> res = new List<Tile>();
 			Tile[] expandDirs = new Tile[8] {
 				new Tile(-1, -1),
@@ -126,7 +128,103 @@ namespace ChessBoard
 				new Tile(1, 1)
 			};
 
-			for (int d = 0; d < 8; d++)
+			for (int d = 0; d < expandDirs.Length; d++)
+			{
+				Tile test = piece.Position + expandDirs[d];
+				while (test.IsValid)
+				{
+					Piece targetPiece = Board[test];
+					if (targetPiece != null)
+					{
+						if (targetPiece.Side != piece.Side)
+						{
+							res.Add(test);
+						}
+						else
+						{
+							InvalidErrors.Add(test, "OCCUPIED");
+						}
+
+						break;
+					}
+					else
+					{
+						res.Add(test);
+					}
+
+					test += expandDirs[d];
+				}
+			}
+
+			return res;
+		}
+
+		public List<Tile> GetValidRookLocations(Piece piece)
+		{
+			if (piece.Type != PieceType.Rook)
+			{
+				throw new ArgumentException("Piece must be a rook.", nameof(piece));
+			}
+
+			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
+
+			List<Tile> res = new List<Tile>();
+			Tile[] expandDirs = new Tile[4] {
+				new Tile(0, -1),
+				new Tile(-1, 0),
+				new Tile(1, 0),
+				new Tile(0, 1)
+			};
+
+			for (int d = 0; d < expandDirs.Length; d++)
+			{
+				Tile test = piece.Position + expandDirs[d];
+				while (test.IsValid)
+				{
+					Piece targetPiece = Board[test];
+					if (targetPiece != null)
+					{
+						if (targetPiece.Side != piece.Side)
+						{
+							res.Add(test);
+						}
+						else
+						{
+							InvalidErrors.Add(test, "OCCUPIED");
+						}
+
+						break;
+					}
+					else
+					{
+						res.Add(test);
+					}
+
+					test += expandDirs[d];
+				}
+			}
+
+			return res;
+		}
+
+		public List<Tile> GetValidBishopLocations(Piece piece)
+		{
+			if (piece.Type != PieceType.Bishop)
+			{
+				throw new ArgumentException("Piece must be a bishop.", nameof(piece));
+			}
+
+			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
+
+			List<Tile> res = new List<Tile>();
+			Tile[] expandDirs = new Tile[4] {
+				new Tile(-1, -1),
+				new Tile(1, -1),
+				new Tile(-1, 1),
+				new Tile(1, 1)
+			};
+
+			for (int d = 0; d < expandDirs.Length; d++)
 			{
 				Tile test = piece.Position + expandDirs[d];
 				while (test.IsValid)
