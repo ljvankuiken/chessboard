@@ -32,9 +32,13 @@ namespace ChessBoardWPFDisplay
 		public double Scale
 		{ get; set; }
 
+		public double Opacity
+		{ get; set; }
+
 		public AABB ActualBounds => new AABB(Position, ActualSize);
 
-		public Sprite(Canvas canvas, string path, Vector2 pos, double scale = 1.0, BitmapScalingMode scaling = BitmapScalingMode.NearestNeighbor)
+		public Sprite(Canvas canvas, string path, Vector2 pos, double scale = 1.0, double opacity = 1.0, 
+			BitmapScalingMode scaling = BitmapScalingMode.NearestNeighbor)
 		{
 			Uri uri = new Uri("pack://application:,,,/" + path);
 			BitmapImage bmp = new BitmapImage(uri);
@@ -42,6 +46,7 @@ namespace ChessBoardWPFDisplay
 			{
 				Source = bmp,
 				Stretch = Stretch.Uniform,
+				Opacity = opacity
 			};
 			canvas.Children.Add(Control);
 
@@ -49,6 +54,7 @@ namespace ChessBoardWPFDisplay
 
 			Position = pos;
 			Scale = scale;
+			Opacity = opacity;
 			Size = new Vector2(bmp.PixelWidth, bmp.PixelHeight);
 		}
 
@@ -63,6 +69,8 @@ namespace ChessBoardWPFDisplay
 
 			Control.Width = Size.X * Scale;
 			Control.Height = Size.Y * Scale;
+
+			Control.Opacity = Opacity;
 		}
     }
 }

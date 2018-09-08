@@ -16,12 +16,43 @@ namespace ChessBoard
     {
 		public readonly Piece[,] Layout = new Piece[8, 8];
 
+		public readonly MovementValidator Validator;
+
 		public Side Turn
 		{ get; private set; }
 
+		public List<Piece> Pieces
+		{
+			get
+			{
+				List<Piece> res = new List<Piece>();
+				foreach (Piece p in Layout)
+				{
+					res.Add(p);
+				}
+
+				return res;
+			}
+		}
+
+		public Piece this[int row, int col]
+		{
+			get => Layout[row, col];
+			set => Layout[row, col] = value;
+		}
+
+		public Piece this[Tile tile]
+		{
+			get => Layout[tile.Row, tile.Column];
+			set => Layout[tile.Row, tile.Column] = value;
+		}
+
 		public Board()
 		{
+			Validator = new MovementValidator(this);
 
+			Turn = Side.White;
+			Reset();
 		}
 
 		public void Reset()
@@ -57,6 +88,17 @@ namespace ChessBoard
 				Layout[1, col] = new Piece(PieceType.Pawn, Side.White, new Tile(1, col));
 				Layout[6, col] = new Piece(PieceType.Pawn, Side.Black, new Tile(6, col));
 			}
+		}
+
+		public void MovePiece(Piece moved, Tile tileTo, bool bypassChecks = true)
+		{
+			this[moved.Position] = null;
+			this[tileTo] = moved;
+			moved.Position = tileTo;
+		}
+		public void MovePiece(Tile tileFrom, Tile tileTo, bool bypassChecks = true)
+		{
+			MovePiece(this[tileFrom], tileTo, bypassChecks);
 		}
     }
 }

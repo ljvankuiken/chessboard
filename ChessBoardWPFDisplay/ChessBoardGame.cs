@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Shapes;
 using ChessBoard;
 
 namespace ChessBoardWPFDisplay
@@ -21,6 +23,9 @@ namespace ChessBoardWPFDisplay
 		public readonly List<RenderedPiece> Pieces = new List<RenderedPiece>();
 
 		public RenderedPiece GrabbedPiece
+		{ get; set; }
+
+		public GhostPiece GrabbedGhost
 		{ get; set; }
 
 		public Vector2 GrabOffset
@@ -39,10 +44,19 @@ namespace ChessBoardWPFDisplay
 					rp.ShowDebug = value;
 					rp.Refresh();
 				}
+
+				if (GrabbedGhost != null)
+				{
+					GrabbedGhost.ShowDebug = value;
+					GrabbedGhost.Refresh();
+				}
+
 				_debugMode = value;
 			}
 		}
 		private bool _debugMode;
+
+		public readonly List<Rectangle> GrabbedValidLocations = new List<Rectangle>();
 
 		public ChessBoardGame(Canvas control) : base(control)
 		{
@@ -52,10 +66,8 @@ namespace ChessBoardWPFDisplay
 			BoardSprite.Control.Tag = "\"QUALITY\" CHESS BOARD";
 
 			Sprites.Add(BoardSprite);
-
-			//SetUpPieces();
+			
 			Board = new Board();
-			Board.Reset();
 			SetUpPiecesFromBoard();
 		}
 
@@ -89,6 +101,15 @@ namespace ChessBoardWPFDisplay
 			GrabbedPiece = piece;
 			GrabOffset = e.GetPosition(piece.Sprite.Control);
 			Panel.SetZIndex(GrabbedPiece.Sprite.Control, 1000);
+
+			foreach (Rectangle r in GrabbedValidLocations)
+			{
+				Canvas.Children.Remove(r);
+			}
+			GrabbedValidLocations.Clear();
+
+			GrabbedGhost = new GhostPiece(GrabbedPiece, Canvas);
+			GrabbedGhost.Initialize();
 		}
 
 		public void DropPiece(Point boardPos)
@@ -99,15 +120,42 @@ namespace ChessBoardWPFDisplay
 			}
 
 			Vector2 posCenter = GrabbedPiece.RenderedPos + GrabbedPiece.Sprite.ActualSize / 2.0;
-			Tile tile = getCoords(posCenter);
-			GrabbedPiece.Piece.Position = tile;
-			GrabbedPiece.RenderedPos = new Vector2(tile.Column / 8.0 * BoardSprite.ActualWidth, (7 - tile.Row) / 8.0 * BoardSprite.ActualHeight) + BoardSprite.Position;
+			Tile tile = getTile(posCenter);
+
+			List<Tile> valid = Board.Validator.GetValidLocations(GrabbedPiece.Piece);
+
+			if (valid == null || valid.Contains(tile))
+			{
+				foreach (RenderedPiece rp in Pieces)
+				{
+					if (rp.Piece.Position == tile)
+					{
+						rp.Disconnect(Canvas);
+					}
+				}
+
+				Board.MovePiece(GrabbedPiece.Piece, tile);
+				GrabbedPiece.RenderedPos = getAbsCoords(tile);
+			}
+			else
+			{
+				GrabbedPiece.RenderedPos = getAbsCoords(GrabbedPiece.Piece.Position);
+			}
 
 			Panel.SetZIndex(GrabbedPiece.Sprite.Control, 10);
 
 			GrabbedPiece.Refresh();
 
 			GrabbedPiece = null;
+
+			GrabbedGhost.Disconnect(Canvas);
+			GrabbedGhost = null;
+
+			foreach (Rectangle r in GrabbedValidLocations)
+			{
+				Canvas.Children.Remove(r);
+			}
+			GrabbedValidLocations.Clear();
 		}
 
 		public override void Refresh(MouseEventArgs e)
@@ -116,12 +164,38 @@ namespace ChessBoardWPFDisplay
 			{
 				GrabbedPiece.RenderedPos = e.GetPositionV() - GrabOffset;
 				GrabbedPiece.Refresh();
+
+				GrabbedGhost.Refresh();
+
+				foreach (Rectangle r in GrabbedValidLocations)
+				{
+					Canvas.Children.Remove(r);
+				}
+				GrabbedValidLocations.Clear();
+
+				List<Tile> valid = Board.Validator.GetValidLocations(GrabbedPiece.Piece);
+				if (valid != null)
+				{
+					foreach (Tile t in valid)
+					{
+						Rectangle r = new Rectangle() {
+							Width = GrabbedPiece.Sprite.ActualWidth,
+							Height = GrabbedPiece.Sprite.ActualHeight,
+							Fill = new SolidColorBrush(Colors.Blue),
+							Opacity = 0.4
+						};
+						r.SetPos(getAbsCoords(t));
+						Panel.SetZIndex(r, 1);
+						Canvas.Children.Add(r);
+						GrabbedValidLocations.Add(r);
+					}
+				}
 			}
 
 			base.Refresh(e);
 		}
 
-		private Tile getCoords(Vector2 pos)
+		private Tile getTile(Vector2 pos)
 		{
 			Vector2 relPos = pos - BoardSprite.Position;
 			
@@ -129,6 +203,12 @@ namespace ChessBoardWPFDisplay
 			int ty = 7 - (int)(relPos.Y / BoardSprite.ActualHeight * 8.0);
 
 			return new Tile(ty, tx);
+		}
+
+		private Vector2 getAbsCoords(Tile tile)
+		{
+			return new Vector2(tile.Column / 8.0 * BoardSprite.ActualWidth,
+				(7 - tile.Row) / 8.0 * BoardSprite.ActualHeight) + BoardSprite.Position;
 		}
 
 		public override string GetDebugText(MouseEventArgs e)
@@ -148,9 +228,14 @@ namespace ChessBoardWPFDisplay
 				lines.Add("Grabbed Piece: " + GrabbedPiece.Piece.ToString());
 
 				Vector2 posCenter = GrabbedPiece.RenderedPos + GrabbedPiece.Sprite.ActualSize / 2.0;
-				Tile tile = getCoords(posCenter);
+				Tile tile = getTile(posCenter);
 
-				lines.Add("(at " + tile.GetPosAlgebraic() + ")");
+				lines.Add("(would move to " + tile.GetPosAlgebraic() + ")");
+
+				if (!Board.Validator.IsMovementValid(GrabbedPiece.Piece, tile))
+				{
+					lines.Add("(" + Board.Validator.InvalidErrors.GetOrDefault(tile, "INVALID") + ")");
+				}
 			}
 
 			string res = "";

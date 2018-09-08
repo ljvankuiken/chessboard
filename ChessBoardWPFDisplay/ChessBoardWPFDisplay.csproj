@@ -58,6 +58,7 @@
     <Compile Include="AABB.cs" />
     <Compile Include="ChessBoardGame.cs" />
     <Compile Include="DisplayUtil.cs" />
+    <Compile Include="GhostPiece.cs" />
     <Compile Include="RenderedPiece.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="Vector2.cs" />

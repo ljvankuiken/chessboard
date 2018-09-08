@@ -31,5 +31,18 @@ namespace ChessBoardWPFDisplay
 			Canvas.SetLeft(element, pos.X);
 			Canvas.SetTop(element, pos.Y);
 		}
+
+		public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue def = default(TValue))
+		{
+			foreach (KeyValuePair<TKey, TValue> kvp in dict)
+			{
+				if (kvp.Key.Equals(key))
+				{
+					return kvp.Value;
+				}
+			}
+
+			return def;
+		}
     }
 }

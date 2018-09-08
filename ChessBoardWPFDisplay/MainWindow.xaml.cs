@@ -36,13 +36,20 @@ namespace ChessBoardWPFDisplay
 		// For some reason Canvas events only proc from elements within the Canvas, but not from the Canvas itself.
 		private void GameCanvas_MouseDown(object sender, MouseButtonEventArgs e)
 		{
-			foreach (RenderedPiece p in ChessWrapper.Pieces)
+			if (e.ChangedButton == MouseButton.Left)
 			{
-				if (p.Sprite.ActualBounds.Contains(e.GetPositionV()))
+				foreach (RenderedPiece p in ChessWrapper.Pieces)
 				{
-					ChessWrapper.GrabPiece(p, e);
-					break;
+					if (p.Sprite.ActualBounds.Contains(e.GetPositionV()))
+					{
+						ChessWrapper.GrabPiece(p, e);
+						break;
+					}
 				}
+			}
+			else if (e.ChangedButton == MouseButton.Right)
+			{
+				MessageBox.Show("Right-clicked: " + e.OriginalSource.ToString());
 			}
 		}
 

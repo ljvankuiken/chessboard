@@ -14,34 +14,36 @@ namespace ChessBoardWPFDisplay
     public class RenderedPiece
     {
 		public Piece Piece
-		{ get; private set; }
+		{ get; protected set; }
 
 		public Vector2 RenderedPos
 		{ get; set; }
 
 		public Sprite Sprite
-		{ get; private set; }
+		{ get; protected set; }
 
 		public Sprite BoardSprite
-		{ get; private set; }
+		{ get; protected set; }
 
-		private readonly Ellipse _centerDot;
-		private readonly Rectangle _boundingBox;
+		protected Ellipse _centerDot;
+		protected Rectangle _boundingBox;
 
 		public bool ShowDebug
 		{ get; set; }
+
+		protected RenderedPiece()
+		{ }
 
 		public RenderedPiece(PieceType type, Side side, Tile tile, Sprite board, Canvas canvas)
 		{
 			Piece = new Piece(type, side, tile);
 			BoardSprite = board;
-			
+
 			double x = (tile.Column / 8.0 * BoardSprite.ActualWidth) + BoardSprite.Position.X;
 			double y = ((7 - tile.Row) / 8.0 * BoardSprite.ActualHeight) + BoardSprite.Position.Y;
 			RenderedPos = new Vector2(x, y);
-
-			string path = "img/qualitypieces/" + type.ToString().ToLower() + "_" + side.ToString().ToLower() + ".png";
-			Sprite = new Sprite(canvas, path, RenderedPos, BoardSprite.Scale);
+			
+			Sprite = new Sprite(canvas, GetImgPath(type, side), RenderedPos, BoardSprite.Scale);
 			Sprite.Control.Tag = Piece.ToString();
 			Panel.SetZIndex(Sprite.Control, 10);
 
@@ -67,6 +69,19 @@ namespace ChessBoardWPFDisplay
 			_boundingBox.SetPos(RenderedPos);
 			Panel.SetZIndex(_boundingBox, 9999);
 			canvas.Children.Add(_boundingBox);
+		}
+
+		public void Disconnect(Canvas canvas)
+		{
+			canvas.Children.Remove(Sprite.Control);
+			canvas.Children.Remove(_centerDot);
+			canvas.Children.Remove(_boundingBox);
+		}
+
+		public static string GetImgPath(PieceType type, Side side)
+		{
+			return "img/qualitypieces/" + type.ToString().ToLower() + "_" + 
+				side.ToString().ToLower() + ".png";
 		}
 
 		public void Initialize()
