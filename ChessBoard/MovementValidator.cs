@@ -51,7 +51,7 @@ namespace ChessBoard
 			case PieceType.Pawn:
 				return null;
 			case PieceType.Knight:
-				return null;
+				return GetValidKnightLocations(piece);
 			case PieceType.Bishop:
 				return GetValidBishopLocations(piece);
 			case PieceType.Rook:
@@ -65,8 +65,6 @@ namespace ChessBoard
 
 		public List<Tile> GetValidKingLocations(Piece piece)
 		{
-			//InvalidErrors.Clear();
-
 			if (piece.Type != PieceType.King)
 			{
 				throw new ArgumentException("Piece must be king.", nameof(piece));
@@ -156,6 +154,7 @@ namespace ChessBoard
 				}
 			}
 
+			_validCache = res;
 			return res;
 		}
 
@@ -204,6 +203,7 @@ namespace ChessBoard
 				}
 			}
 
+			_validCache = res;
 			return res;
 		}
 
@@ -252,6 +252,53 @@ namespace ChessBoard
 				}
 			}
 
+			_validCache = res;
+			return res;
+		}
+
+		public List<Tile> GetValidKnightLocations(Piece piece)
+		{
+			if (piece.Type != PieceType.Knight)
+			{
+				throw new ArgumentException("Piece must be a knight.", nameof(piece));
+			}
+
+			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
+
+			List<Tile> res = new List<Tile>();
+
+			Tile[] offsets = new Tile[8] {
+				new Tile(1, 2),
+				new Tile(-1, 2),
+				new Tile(1, -2),
+				new Tile(-1, -2),
+				new Tile(2, 1),
+				new Tile(-2, 1),
+				new Tile(2, -1),
+				new Tile(-2, -1)
+			};
+
+			foreach (Tile o in offsets)
+			{
+				Tile test = piece.Position + o;
+
+				if (!test.IsValid)
+				{
+					InvalidErrors.Add(test, "OFF BOARD");
+					continue;
+				}
+
+				Piece targetPiece = Board[test];
+				if (targetPiece != null && targetPiece.Side == piece.Side)
+				{
+					InvalidErrors.Add(test, "OCCUPIED");
+					continue;
+				}
+
+				res.Add(test);
+			}
+
+			_validCache = res;
 			return res;
 		}
 	}
