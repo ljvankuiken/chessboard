@@ -34,16 +34,16 @@ namespace ChessBoardWPFDisplay
 		protected RenderedPiece()
 		{ }
 
-		public RenderedPiece(PieceType type, Side side, Tile tile, Sprite board, Canvas canvas)
+		public RenderedPiece(Piece piece, Sprite board, Canvas canvas)
 		{
-			Piece = new Piece(type, side, tile);
+			Piece = piece;
 			BoardSprite = board;
 
-			double x = (tile.Column / 8.0 * BoardSprite.ActualWidth) + BoardSprite.Position.X;
-			double y = ((7 - tile.Row) / 8.0 * BoardSprite.ActualHeight) + BoardSprite.Position.Y;
+			double x = (Piece.Position.Column / 8.0 * BoardSprite.ActualWidth) + BoardSprite.Position.X;
+			double y = ((7 - Piece.Position.Row) / 8.0 * BoardSprite.ActualHeight) + BoardSprite.Position.Y;
 			RenderedPos = new Vector2(x, y);
 			
-			Sprite = new Sprite(canvas, GetImgPath(type, side), RenderedPos, BoardSprite.Scale);
+			Sprite = new Sprite(canvas, GetImgPath(Piece.Type, Piece.Side), RenderedPos, BoardSprite.Scale);
 			Sprite.Control.Tag = Piece.ToString();
 			Panel.SetZIndex(Sprite.Control, 10);
 

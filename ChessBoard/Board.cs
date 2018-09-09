@@ -14,13 +14,21 @@ namespace ChessBoard
 
     public class Board
     {
-		public readonly Piece[,] Layout = new Piece[8, 8];
+		public Piece[,] Layout
+		{ get; } = new Piece[8, 8];
 
-		public readonly MovementValidator Validator;
+		public MovementValidator Validator
+		{ get; }
 
 		public Side Turn
 		{ get; private set; }
 
+		public List<Move> Moves
+		{ get; } = new List<Move>();
+
+		/// <summary>
+		/// Condensed list of all pieces on board. Attempting to modify pieces from here does nothing.
+		/// </summary>
 		public List<Piece> Pieces
 		{
 			get
@@ -37,6 +45,8 @@ namespace ChessBoard
 				return res;
 			}
 		}
+
+		public event PieceMovedEventHandler OnPieceMoved;
 
 		public Piece this[int row, int col]
 		{
@@ -60,6 +70,8 @@ namespace ChessBoard
 
 		public void Reset()
 		{
+			Moves.Clear();
+
 			for (int i = 0; i < 8; i++)
 			{
 				for (int j = 0; i < 8; i++)
@@ -93,31 +105,9 @@ namespace ChessBoard
 			}
 		}
 
-		public void MovePiece(Piece moved, Tile tileTo)
+		internal void AfterPieceMoved(Move move)
 		{
-			Tile tileFrom = moved.Position;
-
-			// En passant checking
-			Tile diff = tileTo - tileFrom;
-			if (moved.Type == PieceType.Pawn && diff.Abs() == Tile.UnitRC && this[tileTo] == null)
-			{
-				Tile victim = tileFrom + diff.ColumnOnly;
-				this[victim] = null;
-			}
-
-			this[moved.Position] = null;
-			this[tileTo] = moved;
-			moved.Position = tileTo;
-			moved.HasMoved = true;
-
-			foreach (Piece p in Layout)
-			{
-				p?.AfterPieceMoved(moved, tileFrom);
-			}
+			OnPieceMoved(move, new PieceMovedEventArgs(move.Piece, move));
 		}
-		public void MovePiece(Tile tileFrom, Tile tileTo)
-		{
-			MovePiece(this[tileFrom], tileTo);
-		}
-    }
+	}
 }

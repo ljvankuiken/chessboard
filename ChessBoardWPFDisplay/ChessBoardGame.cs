@@ -68,6 +68,8 @@ namespace ChessBoardWPFDisplay
 			Sprites.Add(BoardSprite);
 			
 			Board = new Board();
+			Board.OnPieceMoved += onPieceMoved;
+
 			SetUpPiecesFromBoard();
 		}
 
@@ -91,7 +93,7 @@ namespace ChessBoardWPFDisplay
 			{
 				if (p != null)
 				{
-					Pieces.Add(new RenderedPiece(p.Type, p.Side, p.Position, BoardSprite, Canvas));
+					Pieces.Add(new RenderedPiece(p, BoardSprite, Canvas));
 				}
 			}
 		}
@@ -126,17 +128,19 @@ namespace ChessBoardWPFDisplay
 			
 			if (valid == null || valid.Contains(tile))
 			{
-				Board.MovePiece(GrabbedPiece.Piece, tile);
+				Move move = new Move(GrabbedPiece.Piece, tile, Board);
+				Board.Moves.Add(move);
+				move.DoMove();
 
-				for (int i = Pieces.Count - 1; i >= 0; i--)
-				{
-					RenderedPiece rp = Pieces[i];
-					if (!Board.Pieces.Exists(p => rp.Piece.EqualsShallow(p)))
-					{
-						rp.Disconnect(Canvas);
-						Pieces.RemoveAt(i);
-					}
-				}
+				//for (int i = Pieces.Count - 1; i >= 0; i--)
+				//{
+				//	RenderedPiece rp = Pieces[i];
+				//	if (!Board.Pieces.Exists(p => rp.Piece.EqualsShallow(p)))
+				//	{
+				//		rp.Disconnect(Canvas);
+				//		Pieces.RemoveAt(i);
+				//	}
+				//}
 
 				GrabbedPiece.RenderedPos = getAbsCoords(tile);
 			}
@@ -167,7 +171,6 @@ namespace ChessBoardWPFDisplay
 			{
 				GrabbedPiece.RenderedPos = e.GetPositionV() - GrabOffset;
 				GrabbedPiece.Refresh();
-
 				GrabbedGhost.Refresh();
 
 				foreach (Rectangle r in GrabbedValidLocations)
@@ -270,6 +273,19 @@ namespace ChessBoardWPFDisplay
 			}
 
 			return res;
+		}
+
+		private void onPieceMoved(object sender, PieceMovedEventArgs e)
+		{
+			for (int i = Pieces.Count - 1; i >= 0; i--)
+			{
+				RenderedPiece rp = Pieces[i];
+				if (!Board.Pieces.Contains(rp.Piece))
+				{
+					rp.Disconnect(Canvas);
+					Pieces.RemoveAt(i);
+				}
+			}
 		}
 	}
 }

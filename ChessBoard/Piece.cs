@@ -90,7 +90,7 @@ namespace ChessBoard
 			return Side.ToString() + " " + Type.ToString() + " at " + ChessPos;
 		}
 
-		public void AfterPieceMoved(Piece mover, Tile fromTile)
+		internal void AfterPieceMoved(Piece mover, Tile fromTile)
 		{
 			if (mover == this)
 			{

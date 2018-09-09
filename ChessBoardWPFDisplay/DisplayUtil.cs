@@ -34,15 +34,14 @@ namespace ChessBoardWPFDisplay
 
 		public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue def = default(TValue))
 		{
-			foreach (KeyValuePair<TKey, TValue> kvp in dict)
+			try
 			{
-				if (kvp.Key.Equals(key))
-				{
-					return kvp.Value;
-				}
+				return dict[key];
 			}
-
-			return def;
+			catch (KeyNotFoundException)
+			{
+				return def;
+			}
 		}
     }
 }

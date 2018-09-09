@@ -14,7 +14,7 @@ namespace ChessBoardWPFDisplay
 	{
 		public const double OPACITY = 0.6;
 
-		public GhostPiece(PieceType type, Side side, Tile tile, Sprite board, Canvas canvas) : base(type, side, tile, board, canvas)
+		public GhostPiece(Piece piece, Sprite board, Canvas canvas) : base(piece, board, canvas)
 		{
 			Refresh();
 		}
