@@ -105,9 +105,9 @@ namespace ChessBoard
 			}
 		}
 
-		internal void AfterPieceMoved(Move move)
+		internal void AfterPieceMoved(PieceMovedEventArgs e)
 		{
-			OnPieceMoved(move, new PieceMovedEventArgs(move.Piece, move));
+			OnPieceMoved(e.Move, e);
 		}
 	}
 }

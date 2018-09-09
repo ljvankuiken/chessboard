@@ -88,6 +88,7 @@ namespace ChessBoard
 				if ((Side == Side.White && Position.Row == 7) || (Side == Side.Black && Position.Row == 0))
 				{
 					Type = promotedTo;
+					HasMoved = false;
 				}
 			}
 		}

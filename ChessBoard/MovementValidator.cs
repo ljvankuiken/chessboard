@@ -14,7 +14,7 @@ namespace ChessBoard
 		public Dictionary<Tile, string> InvalidErrors
 		{ get; } = new Dictionary<Tile, string>();
 
-		private List<Tile> _validCache;
+		private List<Move> _validCache;
 		private Tile _cachedPosition;
 		private PieceType _cachedType;
 
@@ -25,12 +25,29 @@ namespace ChessBoard
 
 		public bool IsMovementValid(Piece piece, Tile target)
 		{
-			List<Tile> valid = GetValidLocations(piece);
+			List<Move> valid = GetValidLocations(piece);
 
-			return valid == null || valid.Contains(target);
+			return valid == null || valid.Exists(m => m.To == target);
 		}
 
-		public List<Tile> GetValidLocations(Piece piece)
+		public bool IsMovementValid(Piece piece, Tile target, out Move validated)
+		{
+			List<Move> valid = GetValidLocations(piece);
+
+			foreach (Move m in valid)
+			{
+				if (m.To == target)
+				{
+					validated = m;
+					return true;
+				}
+			}
+
+			validated = null;
+			return false;
+		}
+
+		public List<Move> GetValidLocations(Piece piece)
 		{
 			if (_validCache != null && piece.Type == _cachedType && piece.Position == _cachedPosition)
 			{
@@ -64,41 +81,41 @@ namespace ChessBoard
 			}
 		}
 
-		public List<Tile> GetValidKingLocations(Piece piece)
+		public List<Move> GetValidKingLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.King)
 			{
 				throw new ArgumentException("Piece must be king.", nameof(piece));
 			}
 
-			List<Tile> res = new List<Tile>();
+			List<Move> res = new List<Move>();
 
 			for (int row = piece.Position.Row - 1; row <= piece.Position.Row + 1; row++)
 			{
 				for (int col = piece.Position.Column - 1; col <= piece.Position.Column + 1; col++)
 				{
-					Tile t = new Tile(row, col);
+					Tile test = new Tile(row, col);
 
-					if (!t.IsValid)
+					if (!test.IsValid)
 					{
-						InvalidErrors.Add(t, "OFF BOARD");
+						InvalidErrors.Add(test, "OFF BOARD");
 						continue;
 					}
 
-					if (t == piece.Position)
+					if (test == piece.Position)
 					{
-						InvalidErrors.Add(t, "ORIGINAL POSITION");
+						InvalidErrors.Add(test, "ORIGINAL POSITION");
 						continue;
 					}
 
-					Piece targetPiece = Board[t];
+					Piece targetPiece = Board[test];
 					if (targetPiece != null && targetPiece.Side == piece.Side)
 					{
-						InvalidErrors.Add(t, "OCCUPIED");
+						InvalidErrors.Add(test, "OCCUPIED");
 						continue;
 					}
 
-					res.Add(t);
+					res.Add(new Move(piece, test, Board));
 				}
 			}
 
@@ -108,7 +125,7 @@ namespace ChessBoard
 			return res;
 		}
 
-		private void checkCastling(Piece piece, List<Tile> res)
+		private void checkCastling(Piece piece, List<Move> res)
 		{
 			Tile qsCastle = piece.Position + new Tile(0, -2);
 			Tile ksCastle = piece.Position + new Tile(0, 2);
@@ -155,7 +172,7 @@ namespace ChessBoard
 
 					if (allClear)
 					{
-						res.Add(qsCastle);
+						res.Add(new MoveCastle(piece, qsRook, qsCastle, Board));
 					}
 					else
 					{
@@ -201,7 +218,7 @@ namespace ChessBoard
 
 					if (allClear)
 					{
-						res.Add(ksCastle);
+						res.Add(new MoveCastle(piece, ksRook, ksCastle, Board));
 					}
 					else
 					{
@@ -220,7 +237,7 @@ namespace ChessBoard
 			#endregion KS CASTLE
 		}
 
-		public List<Tile> GetValidQueenLocations(Piece piece)
+		public List<Move> GetValidQueenLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.Queen)
 			{
@@ -229,7 +246,7 @@ namespace ChessBoard
 
 			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
 
-			List<Tile> res = new List<Tile>();
+			List<Move> res = new List<Move>();
 			Tile[] expandDirs = new Tile[8] {
 				new Tile(-1, -1),
 				new Tile(0, -1),
@@ -251,7 +268,7 @@ namespace ChessBoard
 					{
 						if (targetPiece.Side != piece.Side)
 						{
-							res.Add(test);
+							res.Add(new Move(piece, test, Board));
 						}
 						else
 						{
@@ -262,7 +279,7 @@ namespace ChessBoard
 					}
 					else
 					{
-						res.Add(test);
+						res.Add(new Move(piece, test, Board));
 					}
 
 					test += expandDirs[d];
@@ -273,7 +290,7 @@ namespace ChessBoard
 			return res;
 		}
 
-		public List<Tile> GetValidRookLocations(Piece piece)
+		public List<Move> GetValidRookLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.Rook)
 			{
@@ -282,7 +299,7 @@ namespace ChessBoard
 
 			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
 
-			List<Tile> res = new List<Tile>();
+			List<Move> res = new List<Move>();
 			Tile[] expandDirs = new Tile[4] {
 				new Tile(0, -1),
 				new Tile(-1, 0),
@@ -300,7 +317,7 @@ namespace ChessBoard
 					{
 						if (targetPiece.Side != piece.Side)
 						{
-							res.Add(test);
+							res.Add(new Move(piece, test, Board));
 						}
 						else
 						{
@@ -311,7 +328,7 @@ namespace ChessBoard
 					}
 					else
 					{
-						res.Add(test);
+						res.Add(new Move(piece, test, Board));
 					}
 
 					test += expandDirs[d];
@@ -322,7 +339,7 @@ namespace ChessBoard
 			return res;
 		}
 
-		public List<Tile> GetValidBishopLocations(Piece piece)
+		public List<Move> GetValidBishopLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.Bishop)
 			{
@@ -331,7 +348,7 @@ namespace ChessBoard
 
 			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
 
-			List<Tile> res = new List<Tile>();
+			List<Move> res = new List<Move>();
 			Tile[] expandDirs = new Tile[4] {
 				new Tile(-1, -1),
 				new Tile(1, -1),
@@ -349,7 +366,7 @@ namespace ChessBoard
 					{
 						if (targetPiece.Side != piece.Side)
 						{
-							res.Add(test);
+							res.Add(new Move(piece, test, Board));
 						}
 						else
 						{
@@ -360,7 +377,7 @@ namespace ChessBoard
 					}
 					else
 					{
-						res.Add(test);
+						res.Add(new Move(piece, test, Board));
 					}
 
 					test += expandDirs[d];
@@ -371,7 +388,7 @@ namespace ChessBoard
 			return res;
 		}
 
-		public List<Tile> GetValidKnightLocations(Piece piece)
+		public List<Move> GetValidKnightLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.Knight)
 
@@ -381,7 +398,7 @@ namespace ChessBoard
 
 			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
 
-			List<Tile> res = new List<Tile>();
+			List<Move> res = new List<Move>();
 
 			Tile[] offsets = new Tile[8] {
 				new Tile(1, 2),
@@ -411,14 +428,14 @@ namespace ChessBoard
 					continue;
 				}
 
-				res.Add(test);
+				res.Add(new Move(piece, test, Board));
 			}
 
 			_validCache = res;
 			return res;
 		}
 
-		public List<Tile> GetValidPawnLocations(Piece piece)
+		public List<Move> GetValidPawnLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.Pawn)
 			{
@@ -427,7 +444,7 @@ namespace ChessBoard
 
 			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
 
-			List<Tile> res = new List<Tile>();
+			List<Move> res = new List<Move>();
 
 			int forward = piece.Side == Side.White ? 1 : -1;
 
@@ -439,7 +456,7 @@ namespace ChessBoard
 			return res;
 		}
 
-		private void checkPawnForward(Piece piece, List<Tile> res, int forward)
+		private void checkPawnForward(Piece piece, List<Move> res, int forward)
 		{
 			Tile inFront = piece.Position + new Tile(forward, 0);
 			Tile inFrontTwo = piece.Position + new Tile(forward * 2, 0);
@@ -456,7 +473,7 @@ namespace ChessBoard
 				}
 				else
 				{
-					res.Add(inFrontTwo);
+					res.Add(new Move(piece, inFrontTwo, Board));
 				}
 			}
 
@@ -468,15 +485,15 @@ namespace ChessBoard
 				}
 				else
 				{
-					res.Add(inFront);
+					res.Add(new Move(piece, inFront, Board));
 				}
 			}
 		}
 
-		private void checkPawnDiagonal(Piece piece, List<Tile> res, int forward, int columnDir)
+		private void checkPawnDiagonal(Piece piece, List<Move> res, int forward, int leftRight)
 		{
-			Tile diagonal = piece.Position + new Tile(forward, columnDir);
-			Tile ep = piece.Position + new Tile(0, columnDir);
+			Tile diagonal = piece.Position + new Tile(forward, leftRight);
+			Tile ep = piece.Position + new Tile(0, leftRight);
 
 			if (diagonal.IsValid)
 			{
@@ -485,7 +502,7 @@ namespace ChessBoard
 					// en passant check
 					if (Board[ep] != null && Board[ep].Type == PieceType.Pawn && Board[ep].PawnJustMovedDouble)
 					{
-						res.Add(diagonal);
+						res.Add(new Move(piece, diagonal, Board));
 					}
 					else
 					{
@@ -498,7 +515,7 @@ namespace ChessBoard
 				}
 				else
 				{
-					res.Add(diagonal);
+					res.Add(new Move(piece, diagonal, Board));
 				}
 			}
 		}

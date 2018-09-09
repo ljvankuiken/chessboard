@@ -12,7 +12,7 @@ namespace ChessBoardWPFDisplay
 {
 	public class GhostPiece : RenderedPiece
 	{
-		public const double OPACITY = 0.6;
+		public const double OPACITY = 0.4;
 
 		public GhostPiece(Piece piece, Sprite board, Canvas canvas) : base(piece, board, canvas)
 		{

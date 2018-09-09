@@ -32,7 +32,7 @@ namespace ChessBoard
 			IsCapture = Board[to] != null;
 		}
 
-		public void DoMove()
+		public virtual void DoMove()
 		{
 			// En passant checking
 			Tile diff = To - From;
@@ -47,7 +47,7 @@ namespace ChessBoard
 			Piece.Position = To;
 			Piece.HasMoved = true;
 
-			Board.AfterPieceMoved(this);
+			Board.AfterPieceMoved(new PieceMovedEventArgs(this));
 		}
 	}
 }

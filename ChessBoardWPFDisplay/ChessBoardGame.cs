@@ -126,25 +126,25 @@ namespace ChessBoardWPFDisplay
 			Vector2 posCenter = GrabbedPiece.RenderedPos + GrabbedPiece.Sprite.ActualSize / 2.0;
 			Tile tile = getTile(posCenter);
 
-			List<Tile> valid = Board.Validator.GetValidLocations(GrabbedPiece.Piece);
-			
-			if (valid == null || valid.Contains(tile))
+			if (Board.Validator.IsMovementValid(GrabbedPiece.Piece, tile, out Move move))
 			{
-				Move move = new Move(GrabbedPiece.Piece, tile, Board);
 				Board.Moves.Add(move);
 				move.DoMove();
 
-				GrabbedPiece.RenderedPos = getAbsCoords(tile);
+				foreach (RenderedPiece rp in Pieces)
+				{
+					rp.RenderedPos = getAbsCoords(rp.Piece.Position);
+					rp.Refresh();
+				}
 			}
 			else
 			{
 				GrabbedPiece.RenderedPos = getAbsCoords(GrabbedPiece.Piece.Position);
+				GrabbedPiece.Refresh();
 			}
 
 			Panel.SetZIndex(GrabbedPiece.Sprite.Control, 10);
-
-			GrabbedPiece.Refresh();
-
+			
 			GrabbedPiece = null;
 
 			GrabbedGhost.Disconnect(Canvas);
@@ -171,10 +171,10 @@ namespace ChessBoardWPFDisplay
 				}
 				GrabbedValidLocations.Clear();
 
-				List<Tile> valid = Board.Validator.GetValidLocations(GrabbedPiece.Piece);
+				List<Move> valid = Board.Validator.GetValidLocations(GrabbedPiece.Piece);
 				if (valid != null)
 				{
-					foreach (Tile t in valid)
+					foreach (Move m in valid)
 					{
 						Rectangle r = new Rectangle() {
 							Width = GrabbedPiece.Sprite.ActualWidth,
@@ -182,7 +182,7 @@ namespace ChessBoardWPFDisplay
 							Fill = new SolidColorBrush(Colors.Blue),
 							Opacity = 0.4
 						};
-						r.SetPos(getAbsCoords(t));
+						r.SetPos(getAbsCoords(m.To));
 						Panel.SetZIndex(r, 1);
 						Canvas.Children.Add(r);
 						GrabbedValidLocations.Add(r);

@@ -10,8 +10,7 @@ namespace ChessBoard
 
 	public class PieceMovedEventArgs
 	{
-		public Piece Piece
-		{ get; }
+		public Piece Piece => Move.Piece;
 
 		public Move Move
 		{ get; }
@@ -19,9 +18,8 @@ namespace ChessBoard
 		public Tile From => Move.From;
 		public Tile To => Move.To;
 
-		public PieceMovedEventArgs(Piece piece, Move move)
+		public PieceMovedEventArgs(Move move)
 		{
-			Piece = piece;
 			Move = move;
 		}
 	}
