@@ -123,11 +123,11 @@ namespace ChessBoardWPFDisplay
 			Tile tile = getTile(posCenter);
 
 			List<Tile> valid = Board.Validator.GetValidLocations(GrabbedPiece.Piece);
-
-			Board.MovePiece(GrabbedPiece.Piece, tile);
-
+			
 			if (valid == null || valid.Contains(tile))
 			{
+				Board.MovePiece(GrabbedPiece.Piece, tile);
+
 				for (int i = Pieces.Count - 1; i >= 0; i--)
 				{
 					RenderedPiece rp = Pieces[i];

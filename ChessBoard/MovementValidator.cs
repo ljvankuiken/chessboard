@@ -101,8 +101,122 @@ namespace ChessBoard
 				}
 			}
 
+			checkCastling(piece, res);
+
 			_validCache = res;
 			return res;
+		}
+
+		private void checkCastling(Piece piece, List<Tile> res)
+		{
+			Tile qsCastle = piece.Position + new Tile(0, -2);
+			Tile ksCastle = piece.Position + new Tile(0, 2);
+
+			if (piece.HasMoved)
+			{
+				InvalidErrors.Add(qsCastle, "KING MOVED");
+				InvalidErrors.Add(ksCastle, "KING MOVED");
+				return;
+			}
+
+			if (!qsCastle.IsValid || !ksCastle.IsValid)
+			{
+				return;
+			}
+
+			int row = piece.Position.Row;
+
+			#region QS CASTLE
+			Piece qsRook = null;
+			for (int i = 0; i < piece.Position.Column - 1; i++)
+			{
+				Piece p = Board[row, i];
+				if (p != null && p.Type == PieceType.Rook)
+				{
+					qsRook = p;
+					break;
+				}
+			}
+
+			if (qsRook != null)
+			{
+				if (!qsRook.HasMoved)
+				{
+					bool allClear = true;
+					for (int i = qsRook.Position.Column + 1; i < piece.Position.Column; i++)
+					{
+						if (Board[row, i] != null)
+						{
+							allClear = false;
+							break;
+						}
+					}
+
+					if (allClear)
+					{
+						res.Add(qsCastle);
+					}
+					else
+					{
+						InvalidErrors.Add(qsCastle, "BLOCKED");
+					}
+				}
+				else
+				{
+					InvalidErrors.Add(qsCastle, "ROOK MOVED");
+				}
+			}
+			else
+			{
+				InvalidErrors.Add(qsCastle, "ROOK MISSING");
+			}
+			#endregion QS CASTLE
+
+			#region KS CASTLE
+			Piece ksRook = null;
+			for (int i = piece.Position.Column + 1; i < 8; i++)
+			{
+				Piece p = Board[row, i];
+				if (p != null && p.Type == PieceType.Rook)
+				{
+					ksRook = p;
+					break;
+				}
+			}
+
+			if (ksRook != null)
+			{
+				if (!ksRook.HasMoved)
+				{
+					bool allClear = true;
+					for (int i = piece.Position.Column + 1; i < ksRook.Position.Column; i++)
+					{
+						if (Board[row, i] != null)
+						{
+							allClear = false;
+							break;
+						}
+					}
+
+					if (allClear)
+					{
+						res.Add(ksCastle);
+					}
+					else
+					{
+						InvalidErrors.Add(ksCastle, "BLOCKED");
+					}
+				}
+				else
+				{
+					InvalidErrors.Add(ksCastle, "ROOK MOVED");
+				}
+			}
+			else
+			{
+				InvalidErrors.Add(ksCastle, "ROOK MISSING");
+			}
+			#endregion KS CASTLE
 		}
 
 		public List<Tile> GetValidQueenLocations(Piece piece)
@@ -316,6 +430,16 @@ namespace ChessBoard
 
 			int forward = piece.Side == Side.White ? 1 : -1;
 
+			checkPawnForward(piece, res, forward);
+
+			checkPawnDiagonal(piece, res, forward, -1);
+			checkPawnDiagonal(piece, res, forward, 1);
+
+			return res;
+		}
+
+		private void checkPawnForward(Piece piece, List<Tile> res, int forward)
+		{
 			Tile inFront = piece.Position + new Tile(forward, 0);
 			Tile inFrontTwo = piece.Position + new Tile(forward * 2, 0);
 
@@ -346,60 +470,36 @@ namespace ChessBoard
 					res.Add(inFront);
 				}
 			}
+		}
 
-			Tile diagonalMinus = piece.Position + new Tile(forward, -1);
-			Tile diagonalPlus = piece.Position + new Tile(forward, 1);
+		private void checkPawnDiagonal(Piece piece, List<Tile> res, int forward, int columnDir)
+		{
+			Tile diagonal = piece.Position + new Tile(forward, columnDir);
+			Tile ep = piece.Position + new Tile(0, columnDir);
 
-			Tile epMinus = piece.Position + new Tile(0, -1);
-			Tile epPlus = piece.Position + new Tile(0, 1);
-
-			if (diagonalMinus.IsValid)
+			if (diagonal.IsValid)
 			{
-				if (Board[diagonalMinus] == null)
+				if (Board[diagonal] == null)
 				{
-					if (Board[epMinus] != null && Board[epMinus].Type == PieceType.Pawn && Board[epMinus].PawnJustMovedDouble)
+					// en passant check
+					if (Board[ep] != null && Board[ep].Type == PieceType.Pawn && Board[ep].PawnJustMovedDouble)
 					{
-						res.Add(diagonalMinus);
+						res.Add(diagonal);
 					}
 					else
 					{
-						InvalidErrors.Add(diagonalMinus, "EMPTY");
+						InvalidErrors.Add(diagonal, "EMPTY");
 					}
 				}
-				else if (Board[diagonalMinus].Side == piece.Side)
+				else if (Board[diagonal].Side == piece.Side)
 				{
-					InvalidErrors.Add(diagonalMinus, "OCCUPIED");
+					InvalidErrors.Add(diagonal, "OCCUPIED");
 				}
 				else
 				{
-					res.Add(diagonalMinus);
+					res.Add(diagonal);
 				}
 			}
-
-			if (diagonalPlus.IsValid)
-			{
-				if (Board[diagonalPlus] == null)
-				{
-					if (Board[epPlus] != null && Board[epPlus].Type == PieceType.Pawn && Board[epPlus].PawnJustMovedDouble)
-					{
-						res.Add(diagonalPlus);
-					}
-					else
-					{
-						InvalidErrors.Add(diagonalPlus, "EMPTY");
-					}
-				}
-				else if (Board[diagonalPlus].Side == piece.Side)
-				{
-					InvalidErrors.Add(diagonalPlus, "OCCUPIED");
-				}
-				else
-				{
-					res.Add(diagonalPlus);
-				}
-			}
-
-			return res;
 		}
 	}
 }
