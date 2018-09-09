@@ -9,9 +9,10 @@ namespace ChessBoard
 	public class MovementValidator
 	{
 		public Board Board
-		{ get; private set; }
+		{ get; }
 
-		public readonly Dictionary<Tile, string> InvalidErrors = new Dictionary<Tile, string>();
+		public Dictionary<Tile, string> InvalidErrors
+		{ get; } = new Dictionary<Tile, string>();
 
 		private List<Tile> _validCache;
 		private Tile _cachedPosition;

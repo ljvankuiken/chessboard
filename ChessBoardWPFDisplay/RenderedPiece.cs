@@ -25,8 +25,11 @@ namespace ChessBoardWPFDisplay
 		public Sprite BoardSprite
 		{ get; protected set; }
 
-		protected Ellipse _centerDot;
-		protected Rectangle _boundingBox;
+		public Ellipse DebugCenterDot
+		{ get; protected set; }
+
+		public Rectangle DebugBoundingBox
+		{ get; protected set; }
 
 		public bool ShowDebug
 		{ get; set; }
@@ -47,18 +50,18 @@ namespace ChessBoardWPFDisplay
 			Sprite.Control.Tag = Piece.ToString();
 			Panel.SetZIndex(Sprite.Control, 10);
 
-			_centerDot = new Ellipse() {
+			DebugCenterDot = new Ellipse() {
 				Width = 10,
 				Height = 10,
 				Fill = new SolidColorBrush(Colors.Red),
 				Opacity = 0
 			};
 			Vector2 dotPos = RenderedPos + (Sprite.ActualSize / 2.0) - new Vector2(5);
-			_centerDot.SetPos(dotPos);
-			Panel.SetZIndex(_centerDot, 10000);
-			canvas.Children.Add(_centerDot);
+			DebugCenterDot.SetPos(dotPos);
+			Panel.SetZIndex(DebugCenterDot, 10000);
+			canvas.Children.Add(DebugCenterDot);
 
-			_boundingBox = new Rectangle() {
+			DebugBoundingBox = new Rectangle() {
 				Width = Sprite.ActualWidth,
 				Height = Sprite.ActualHeight,
 				Fill = new SolidColorBrush(Colors.Goldenrod),
@@ -66,16 +69,16 @@ namespace ChessBoardWPFDisplay
 				Stroke = new SolidColorBrush(Colors.Black),
 				Opacity = 0
 			};
-			_boundingBox.SetPos(RenderedPos);
-			Panel.SetZIndex(_boundingBox, 9999);
-			canvas.Children.Add(_boundingBox);
+			DebugBoundingBox.SetPos(RenderedPos);
+			Panel.SetZIndex(DebugBoundingBox, 9999);
+			canvas.Children.Add(DebugBoundingBox);
 		}
 
 		public void Disconnect(Canvas canvas)
 		{
 			canvas.Children.Remove(Sprite.Control);
-			canvas.Children.Remove(_centerDot);
-			canvas.Children.Remove(_boundingBox);
+			canvas.Children.Remove(DebugCenterDot);
+			canvas.Children.Remove(DebugBoundingBox);
 		}
 
 		public static string GetImgPath(PieceType type, Side side)
@@ -94,12 +97,12 @@ namespace ChessBoardWPFDisplay
 			Sprite.Position = RenderedPos;
 			Sprite.Refresh();
 
-			_centerDot.Opacity = ShowDebug ? 1 : 0;
+			DebugCenterDot.Opacity = ShowDebug ? 1 : 0;
 			Vector2 dotPos = RenderedPos + (Sprite.ActualSize / 2.0) - new Vector2(5);
-			_centerDot.SetPos(dotPos);
+			DebugCenterDot.SetPos(dotPos);
 
-			_boundingBox.Opacity = ShowDebug ? 0.3 : 0;
-			_boundingBox.SetPos(RenderedPos);
+			DebugBoundingBox.Opacity = ShowDebug ? 0.3 : 0;
+			DebugBoundingBox.SetPos(RenderedPos);
 		}
     }
 }

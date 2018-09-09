@@ -19,7 +19,7 @@ namespace ChessBoardWPFDisplay
 		{ get; set; }
 
 		public Vector2 Size
-		{ get; private set; }
+		{ get; }
 
 		public double Width => Size.X;
 		public double Height => Size.Y;

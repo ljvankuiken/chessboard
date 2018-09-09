@@ -20,7 +20,8 @@ namespace ChessBoardWPFDisplay
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		public readonly ChessBoardGame ChessWrapper;
+		public ChessBoardGame ChessWrapper
+		{ get; }
 
 		public MainWindow()
 		{

@@ -32,18 +32,18 @@ namespace ChessBoardWPFDisplay
 			Sprite.Control.Tag = Piece.ToString();
 			Panel.SetZIndex(Sprite.Control, 10);
 
-			_centerDot = new Ellipse() {
+			DebugCenterDot = new Ellipse() {
 				Width = 10,
 				Height = 10,
 				Fill = new SolidColorBrush(Colors.Red),
 				Opacity = 0
 			};
 			Vector2 dotPos = RenderedPos + (Sprite.ActualSize / 2.0) - new Vector2(5);
-			_centerDot.SetPos(dotPos);
-			Panel.SetZIndex(_centerDot, 10000);
-			canvas.Children.Add(_centerDot);
+			DebugCenterDot.SetPos(dotPos);
+			Panel.SetZIndex(DebugCenterDot, 10000);
+			canvas.Children.Add(DebugCenterDot);
 
-			_boundingBox = new Rectangle() {
+			DebugBoundingBox = new Rectangle() {
 				Width = Sprite.ActualWidth,
 				Height = Sprite.ActualHeight,
 				Fill = new SolidColorBrush(Colors.ForestGreen),
@@ -51,9 +51,9 @@ namespace ChessBoardWPFDisplay
 				Stroke = new SolidColorBrush(Colors.Black),
 				Opacity = 0
 			};
-			_boundingBox.SetPos(RenderedPos);
-			Panel.SetZIndex(_boundingBox, 9999);
-			canvas.Children.Add(_boundingBox);
+			DebugBoundingBox.SetPos(RenderedPos);
+			Panel.SetZIndex(DebugBoundingBox, 9999);
+			canvas.Children.Add(DebugBoundingBox);
 
 			ShowDebug = clonedFrom.ShowDebug;
 		}

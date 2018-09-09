@@ -40,7 +40,7 @@ namespace ChessBoard
 		/// Which player controls this piece.
 		/// </summary>
 		public Side Side
-		{ get; private set; }
+		{ get; }
 
 		/// <summary>
 		/// Returns the chess notation position for this piece (e.g., "e5").
@@ -62,14 +62,21 @@ namespace ChessBoard
 		public bool PawnJustMovedDouble
 		{ get; set; }
 
-		public Piece(PieceType type, Side side, Tile tile)
+		public Piece(PieceType type, Side side, Tile tile, Board board)
 		{
 			Position = tile;
 			Type = type;
 			Side = side;
+
+			board.OnPieceMoved += AfterPieceMoved;
 		}
 
-		public void Promote(PieceType promotedTo = PieceType.Queen)
+		/// <summary>
+		/// Promotes pawn to a higher type. Does nothing for any other type.
+		/// </summary>
+		/// <param name="promotedTo">Type of piece to be promoted to.</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="promotedTo"/> is <see cref="PieceType.King"/>.</exception>
+		public void Promote(PieceType promotedTo)
 		{
 			if (promotedTo == PieceType.King)
 			{
@@ -90,17 +97,17 @@ namespace ChessBoard
 			return Side.ToString() + " " + Type.ToString() + " at " + ChessPos;
 		}
 
-		internal void AfterPieceMoved(Piece mover, Tile fromTile)
+		internal void AfterPieceMoved(object sender, PieceMovedEventArgs e)
 		{
-			if (mover == this)
+			if (e.Piece == this)
 			{
-				if (Type == PieceType.Pawn && fromTile.Column == Position.Column &&
-					Math.Abs(fromTile.Row - Position.Row) == 2)
+				if (Type == PieceType.Pawn && e.From.Column == Position.Column &&
+					Math.Abs(e.From.Row - Position.Row) == 2)
 				{
 					PawnJustMovedDouble = true;
 				}
 			}
-			else if (mover.Side != Side)
+			else if (e.Piece.Side != Side)
 			{
 				PawnJustMovedDouble = false;
 			}

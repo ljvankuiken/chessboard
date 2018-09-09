@@ -16,6 +16,9 @@ namespace ChessBoard
 		public Move Move
 		{ get; }
 
+		public Tile From => Move.From;
+		public Tile To => Move.To;
+
 		public PieceMovedEventArgs(Piece piece, Move move)
 		{
 			Piece = piece;

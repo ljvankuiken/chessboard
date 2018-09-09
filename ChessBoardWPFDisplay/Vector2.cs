@@ -10,10 +10,10 @@ namespace ChessBoardWPFDisplay
 	public struct Vector2 : IEquatable<Vector2>
 	{
 		public double X
-		{ get; private set; }
+		{ get; }
 
 		public double Y
-		{ get; private set; }
+		{ get; }
 
 		public static Vector2 Zero => new Vector2(0, 0);
 

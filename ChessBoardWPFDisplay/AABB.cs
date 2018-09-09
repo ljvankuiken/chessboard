@@ -9,27 +9,18 @@ namespace ChessBoardWPFDisplay
 	public struct AABB : IEquatable<AABB>
 	{
 		public double X
-		{ get; private set; }
+		{ get; }
 
 		public double Y
-		{ get; private set; }
+		{ get; }
 
 		public double Width
-		{ get; private set; }
+		{ get; }
 
 		public double Height
-		{ get; private set; }
+		{ get; }
 
-		public Vector2 TopLeft
-		{
-			get => new Vector2(X, Y);
-			set
-			{
-				X = value.X;
-				Y = value.Y;
-			}
-		}
-
+		public Vector2 TopLeft => new Vector2(X, Y);
 		public Vector2 TopRight => new Vector2(X + Width, Y);
 		public Vector2 BottomLeft => new Vector2(X, Y + Height);
 		public Vector2 BottomRight => new Vector2(X + Width, Y + Height);

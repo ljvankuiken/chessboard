@@ -9,10 +9,10 @@ namespace ChessBoard
 	public struct Tile : IEquatable<Tile>
 	{
 		public int Row
-		{ get; private set; }
+		{ get; }
 
 		public int Column
-		{ get; private set; }
+		{ get; }
 
 		public static Tile UnitR => new Tile(1, 0);
 		public static Tile UnitC => new Tile(0, 1);

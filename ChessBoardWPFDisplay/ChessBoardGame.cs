@@ -15,12 +15,13 @@ namespace ChessBoardWPFDisplay
     public class ChessBoardGame : CanvasGame
     {
 		public Sprite BoardSprite
-		{ get; private set; }
+		{ get; }
 
 		public double Scale
 		{ get; private set; }
 
-		public readonly List<RenderedPiece> Pieces = new List<RenderedPiece>();
+		public List<RenderedPiece> Pieces
+		{ get; } = new List<RenderedPiece>();
 
 		public RenderedPiece GrabbedPiece
 		{ get; set; }
@@ -32,7 +33,7 @@ namespace ChessBoardWPFDisplay
 		{ get; set; }
 
 		public Board Board
-		{ get; private set; }
+		{ get; }
 
 		public bool DebugMode
 		{
@@ -56,7 +57,8 @@ namespace ChessBoardWPFDisplay
 		}
 		private bool _debugMode;
 
-		public readonly List<Rectangle> GrabbedValidLocations = new List<Rectangle>();
+		public List<Rectangle> GrabbedValidLocations
+		{ get; } = new List<Rectangle>();
 
 		public ChessBoardGame(Canvas control) : base(control)
 		{
@@ -131,16 +133,6 @@ namespace ChessBoardWPFDisplay
 				Move move = new Move(GrabbedPiece.Piece, tile, Board);
 				Board.Moves.Add(move);
 				move.DoMove();
-
-				//for (int i = Pieces.Count - 1; i >= 0; i--)
-				//{
-				//	RenderedPiece rp = Pieces[i];
-				//	if (!Board.Pieces.Exists(p => rp.Piece.EqualsShallow(p)))
-				//	{
-				//		rp.Disconnect(Canvas);
-				//		Pieces.RemoveAt(i);
-				//	}
-				//}
 
 				GrabbedPiece.RenderedPos = getAbsCoords(tile);
 			}

@@ -47,11 +47,6 @@ namespace ChessBoard
 			Piece.Position = To;
 			Piece.HasMoved = true;
 
-			foreach (Piece p in Board.Layout)
-			{
-				p?.AfterPieceMoved(Piece, From);
-			}
-
 			Board.AfterPieceMoved(this);
 		}
 	}
