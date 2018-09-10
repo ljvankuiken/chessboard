@@ -22,9 +22,6 @@ namespace ChessBoardWPFDisplay
 		{
 			Piece = clonedFrom.Piece;
 			BoardSprite = clonedFrom.BoardSprite;
-
-			//double x = (clonedFrom.Piece.Column / 8.0 * BoardSprite.ActualWidth) + BoardSprite.Position.X;
-			//double y = ((7 - tile.Row) / 8.0 * BoardSprite.ActualHeight) + BoardSprite.Position.Y;
 			RenderedPos = clonedFrom.RenderedPos;
 
 			Sprite = new Sprite(canvas, GetImgPath(clonedFrom.Piece.Type, clonedFrom.Piece.Side), 

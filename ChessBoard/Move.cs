@@ -30,11 +30,19 @@ namespace ChessBoard
 			From = Piece.Position;
 			To = to;
 			IsCapture = Board[to] != null;
+
+			// En passant capture identifying
+			int forward = moved.Side == Side.White ? 1 : -1;
+			Tile behind = new Tile(To.Row - forward, To.Column);
+			if (moved.Type == PieceType.Pawn && Board[behind] != null)
+			{
+				IsCapture = true;
+			}
 		}
 
 		public virtual void DoMove()
 		{
-			// En passant checking
+			// En passant capture
 			Tile diff = To - From;
 			if (Piece.Type == PieceType.Pawn && diff.Abs() == Tile.UnitRC && Board[To] == null)
 			{

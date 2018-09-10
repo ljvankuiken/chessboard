@@ -35,6 +35,9 @@ namespace ChessBoardWPFDisplay
 		public Board Board
 		{ get; }
 
+		public bool EnforceTurns
+		{ get; set; }
+
 		public bool DebugMode
 		{
 			get => _debugMode;
@@ -73,6 +76,8 @@ namespace ChessBoardWPFDisplay
 			Board.OnPieceMoved += onPieceMoved;
 
 			SetUpPiecesFromBoard();
+
+			EnforceTurns = true;
 		}
 
 		public override void Initialize(RoutedEventArgs e)
@@ -102,6 +107,11 @@ namespace ChessBoardWPFDisplay
 
 		public void GrabPiece(RenderedPiece piece, MouseButtonEventArgs e)
 		{
+			if (EnforceTurns && piece.Piece.Side != Board.Turn)
+			{
+				return;
+			}
+
 			GrabbedPiece = piece;
 			GrabOffset = e.GetPosition(piece.Sprite.Control);
 			Panel.SetZIndex(GrabbedPiece.Sprite.Control, 1000);
@@ -254,6 +264,16 @@ namespace ChessBoardWPFDisplay
 				{
 					lines.Add("Open to en passant");
 				}
+
+				if (pointedAtPiece.Side != Board.Turn)
+				{
+					lines.Add("Wrong turn");
+				}
+			}
+
+			if (!EnforceTurns)
+			{
+				lines.Add("TURNS DISABLED");
 			}
 
 			// ---
@@ -269,6 +289,7 @@ namespace ChessBoardWPFDisplay
 
 		private void onPieceMoved(object sender, PieceMovedEventArgs e)
 		{
+			// Remove captured pieces
 			for (int i = Pieces.Count - 1; i >= 0; i--)
 			{
 				RenderedPiece rp = Pieces[i];
@@ -278,6 +299,8 @@ namespace ChessBoardWPFDisplay
 					Pieces.RemoveAt(i);
 				}
 			}
+
+			Board.SwitchTurn();
 		}
 	}
 }

@@ -63,9 +63,13 @@ namespace ChessBoard
 		public Board()
 		{
 			Validator = new MovementValidator(this);
-
-			Turn = Side.White;
+			
 			Reset();
+		}
+
+		public void SwitchTurn()
+		{
+			Turn = Turn.Opposite();
 		}
 
 		public void Reset()
@@ -103,6 +107,8 @@ namespace ChessBoard
 				Layout[1, col] = new Piece(PieceType.Pawn, Side.White, new Tile(1, col), this);
 				Layout[6, col] = new Piece(PieceType.Pawn, Side.Black, new Tile(6, col), this);
 			}
+
+			Turn = Side.White;
 		}
 
 		internal void AfterPieceMoved(PieceMovedEventArgs e)

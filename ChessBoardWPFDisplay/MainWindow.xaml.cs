@@ -72,6 +72,11 @@ namespace ChessBoardWPFDisplay
 			{
 				ChessWrapper.DebugMode = !ChessWrapper.DebugMode;
 			}
+
+			if (e.Key == Key.F8)
+			{
+				ChessWrapper.EnforceTurns = !ChessWrapper.EnforceTurns;
+			}
 		}
 	}
 }
