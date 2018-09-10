@@ -1,0 +1,60 @@
+﻿<Window x:Class="ChessBoardWPFDisplay.PromotionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ChessBoardWPFDisplay"
+        mc:Ignorable="d"
+        Title="Promotions!" 
+        Height="200" Width="300"
+        ResizeMode="CanMinimize"
+        ShowInTaskbar="False"
+        Topmost="True"
+        WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded">
+  <Grid Margin="5">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <Button x:Name="QueenBtn"
+            Margin="5"
+            Grid.ColumnSpan="3"
+            IsDefault="True"
+            Click="QueenBtn_Click">
+
+      <TextBlock Text="Queen (Default)"
+                 FontSize="20" />
+    </Button>
+    <Button x:Name="RookBtn"
+            Margin="5"
+            Grid.Row="1"
+            Click="RookBtn_Click">
+      <TextBlock Text="Rook"
+                 FontSize="18"/>
+    </Button>
+    <Button x:Name="KnightBtn"
+            Margin="5"
+            Grid.Row="1"
+            Grid.Column="1"
+            Click="KnightBtn_Click">
+      <TextBlock Text="Knight"
+                 FontSize="18"/>
+    </Button>
+    <Button x:Name="BishopBtn"
+            Margin="5"
+            Grid.Row="1"
+            Grid.Column="2"
+            Click="BishopBtn_Click">
+      <TextBlock Text="Bishop"
+                 FontSize="18"/>
+    </Button>
+  </Grid>
+</Window>

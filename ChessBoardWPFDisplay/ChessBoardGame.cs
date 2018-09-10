@@ -158,17 +158,9 @@ namespace ChessBoardWPFDisplay
 				Board.Moves.Add(move);
 				if (move is MovePromotion mpPre)
 				{
-					MessageBoxResult mbr = MessageBox.Show("Would you like to promote to queen or knight? Yes for queen, no for knight.", 
-						"Promotions", MessageBoxButton.YesNo);
-					if (mbr == MessageBoxResult.No)
-					{
-						mpPre.Promotion = PieceType.Knight;
-					}
-					else
-					{
-						mpPre.Promotion = PieceType.Queen;
-					}
-
+					PromotionsWindow promotionDialog = new PromotionsWindow();
+					promotionDialog.ShowDialog();
+					mpPre.Promotion = promotionDialog.Result;
 				}
 
 				move.DoMove();

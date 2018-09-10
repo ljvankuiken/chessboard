@@ -59,6 +59,9 @@
     <Compile Include="ChessBoardGame.cs" />
     <Compile Include="DisplayUtil.cs" />
     <Compile Include="GhostPiece.cs" />
+    <Compile Include="PromotionsWindow.xaml.cs">
+      <DependentUpon>PromotionsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RenderedPiece.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="Vector2.cs" />
@@ -75,6 +78,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="PromotionsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
