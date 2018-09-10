@@ -44,6 +44,19 @@ namespace ChessBoard
 			return new Tile(Util.Clamp(Row, 0, 7), Util.Clamp(Column, 0, 7));
 		}
 
+		public char FileLetter()
+		{
+			const string LETTERS = "abcdefgh";
+			return LETTERS[Column];
+		}
+
+		public string FileEnglishAbbrev()
+		{
+			string[] COLUMNS = new string[] { "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR" };
+
+			return COLUMNS[Column];
+		}
+
 		public override bool Equals(object obj)
 		{
 			if (obj is Tile other)
@@ -62,7 +75,39 @@ namespace ChessBoard
 
 		public override string ToString()
 		{
-			return Util.GetPosAlgebraic(this);
+			try
+			{
+				return ToStringAlgebraic();
+			}
+			catch (IndexOutOfRangeException)
+			{
+				return $"[OFF-BOARD: COL {Column} ROW {Row}]";
+			}
+		}
+
+		public string ToStringAlgebraic()
+		{
+			return ToStringCoordinate().ToLower();
+		}
+
+		public string ToStringCoordinate()
+		{
+			const string LETTERS = "ABCDEFGH";
+			char colChar = LETTERS[Util.Clamp(Column, 0, 7)];
+
+			return colChar.ToString() + Util.Clamp(Row + 1, 1, 8).ToString();
+		}
+
+		public string ToStringEnglish(Side side = Side.White)
+		{
+			int relRow = Util.Clamp(side == Side.White ? Row : 7 - Row, 0, 7) + 1;
+
+			return FileEnglishAbbrev() + relRow.ToString();
+		}
+
+		public string ToStringICCF()
+		{
+			return (Column + 1).ToString() + (Row + 1).ToString();
 		}
 
 		public static Tile operator+(Tile a, Tile b)

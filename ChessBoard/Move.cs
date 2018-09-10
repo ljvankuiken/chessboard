@@ -41,9 +41,15 @@ namespace ChessBoard
 		public Board Board
 		{ get; }
 
+		public string NotationAlgebraic
+		{ get; protected set; }
+
+		public string NotationEnglish
+		{ get; protected set; }
+
 		internal Guid ID;
 
-		public Move(Piece moved, Tile to, Board board)
+		public Move(Piece moved, Tile to, Board board, bool skipCheck = false)
 		{
 			ID = Guid.NewGuid();
 
@@ -56,9 +62,19 @@ namespace ChessBoard
 			// En passant capture identifying
 			int forward = moved.Side == Side.White ? 1 : -1;
 			Tile behind = new Tile(To.Row - forward, To.Column);
-			if (moved.Type == PieceType.Pawn && Board[behind] != null)
+			if (moved.Type == PieceType.Pawn && Board[behind] != null && To.Column != From.Column)
 			{
 				IsCapture = true;
+			}
+
+			// These two notations depend on the positions of other pieces, so must be generated 
+			//   and cached before those pieces are moved to other locations.
+			NotationAlgebraic = generateStringAlgebraic();
+			NotationEnglish = generateStringEnglish();
+
+			if (!skipCheck)
+			{
+				AppendCheckNotation();
 			}
 		}
 
@@ -74,8 +90,7 @@ namespace ChessBoard
 				Tile victimPos = From + diff.ColumnOnly;
 				Board.RemoveAt(victimPos);
 			}
-
-			//Board[To] = Piece;
+			
 			Piece victim = Board[To];
 			if (victim != null)
 			{
@@ -90,8 +105,128 @@ namespace ChessBoard
 
 		public override string ToString()
 		{
-			// non-standard for ease of readability
-			return $"{Piece.Side} {Piece.Type} from {From.GetPosAlgebraic()} to {To.GetPosAlgebraic()}";
+			// non-standard for layman readability
+			return $"{Piece.Side} {Piece.Type}: {From.ToStringAlgebraic()}-{To.ToStringAlgebraic()}";
+		}
+
+		private string generateStringAlgebraic()
+		{
+			string res = To.ToStringAlgebraic();
+
+			if (IsCapture)
+			{
+				res = "x" + res;
+
+				if (Piece.Type == PieceType.Pawn)
+				{
+					res = From.FileLetter() + res;
+				}
+			}
+
+			if (Piece.Type != PieceType.Pawn)
+			{
+				IEnumerable<Piece> ambigOthers = Board.Pieces.Where(p => p != Piece && p.Type == Piece.Type && p.Side == Piece.Side);
+				if (ambigOthers.Count() > 0)
+				{
+					if (ambigOthers.UniqueAmongAll(p => p.Position.Column))
+					{
+						res = From.FileLetter().ToString() + res;
+					}
+					else if (ambigOthers.UniqueAmongAll(p => p.Position.Row))
+					{
+						res = (From.Row + 1).ToString() + res;
+					}
+					else
+					{
+						res = From.ToStringAlgebraic() + res;
+					}
+				}
+
+				res = Piece.Type.Abbreviation() + res;
+			}
+
+			return res;
+		}
+
+		private string generateStringEnglish()
+		{
+			string res = "";
+
+			if (IsCapture)
+			{
+				Piece victim = Board[To];
+
+				// en passant
+				if (victim == null && Piece.Type == PieceType.Pawn)
+				{
+					res = Piece.Position.FileEnglishAbbrev() + "PxPe.p.";
+				}
+				else
+				{
+					res = Piece.Type.Abbreviation(true) + "x" + victim.Type.Abbreviation(true);
+
+					// Regular capture
+					if (Piece.Type == PieceType.Pawn)
+					{
+						IEnumerable<Piece> ambigOthers = Board.Pieces.Where(p => p != Piece && p.Type == PieceType.Pawn && p.Side == Piece.Side);
+						if (ambigOthers.Count() > 0)
+						{
+							res = From.FileEnglishAbbrev() + res;
+						}
+					}
+					else
+					{
+						IEnumerable<Piece> ambigPossibleVictims = Board.Pieces.Where(p => p != victim && p.Type == victim.Type && p.Side == victim.Side);
+						if (ambigPossibleVictims.Count() > 0)
+						{
+							res += "/" + To.ToStringEnglish(Piece.Side);
+						}
+					}
+				}
+			}
+			else
+			{
+				res = Piece.Type.Abbreviation(true);
+
+				IEnumerable<Piece> ambigOthers = Board.Pieces.Where(p => p != Piece && p.Type == Piece.Type && p.Side == Piece.Side);
+				if (ambigOthers.Count() > 0)
+				{
+					res += "(" + From.ToStringEnglish(Piece.Side) + ")";
+				}
+
+				res += "-" + To.ToStringEnglish(Piece.Side);
+			}
+
+			return res;
+		}
+
+		public void AppendCheckNotation()
+		{
+			if (Board.CheckIfMated(Piece.Side.Opposite()) == Piece.Side.GetVictoryStatus())
+			{
+				NotationAlgebraic += "#";
+				NotationEnglish += "mate";
+			}
+			else if (Board.IsInCheck(Piece.Side.Opposite()))
+			{
+				NotationAlgebraic += "+";
+				NotationEnglish += "ch";
+			}
+		}
+
+		public virtual string ToStringPGN()
+		{
+			return NotationAlgebraic; // Only difference is promotions, which are not implemented yet.
+		}
+
+		public string ToStringCoordinate()
+		{
+			return From.ToStringCoordinate() + "-" + To.ToStringCoordinate();
+		}
+
+		public string ToStringICCF()
+		{
+			return From.ToStringICCF() + To.ToStringICCF();
 		}
 	}
 }

@@ -195,7 +195,7 @@ namespace ChessBoard
 		{
 			Board future = Board.DeepCopy();
 			//Move moveTested = moveOriginal.DeepCopy(future);
-			Move moveTested = new Move(future[moveOriginal.From], moveOriginal.To, future);
+			Move moveTested = new Move(future[moveOriginal.From], moveOriginal.To, future, true);
 			future.Moves.Add(moveTested);
 			moveTested.DoMove();
 		
@@ -259,7 +259,7 @@ namespace ChessBoard
 						continue;
 					}
 
-					res.Add(new Move(piece, test, Board));
+					res.Add(new Move(piece, test, Board, true));
 				}
 			}
 
@@ -476,7 +476,7 @@ namespace ChessBoard
 					{
 						if (targetPiece.Side != piece.Side)
 						{
-							res.Add(new Move(piece, test, Board));
+							res.Add(new Move(piece, test, Board, true));
 						}
 						else
 						{
@@ -487,7 +487,7 @@ namespace ChessBoard
 					}
 					else
 					{
-						res.Add(new Move(piece, test, Board));
+						res.Add(new Move(piece, test, Board, true));
 					}
 
 					test += expandDirs[d];
@@ -570,7 +570,7 @@ namespace ChessBoard
 					{
 						if (targetPiece.Side != piece.Side)
 						{
-							res.Add(new Move(piece, test, Board));
+							res.Add(new Move(piece, test, Board, true));
 						}
 						else
 						{
@@ -581,7 +581,7 @@ namespace ChessBoard
 					}
 					else
 					{
-						res.Add(new Move(piece, test, Board));
+						res.Add(new Move(piece, test, Board, true));
 					}
 
 					test += expandDirs[d];
@@ -660,7 +660,7 @@ namespace ChessBoard
 					{
 						if (targetPiece.Side != piece.Side)
 						{
-							res.Add(new Move(piece, test, Board));
+							res.Add(new Move(piece, test, Board, true));
 						}
 						else
 						{
@@ -671,7 +671,7 @@ namespace ChessBoard
 					}
 					else
 					{
-						res.Add(new Move(piece, test, Board));
+						res.Add(new Move(piece, test, Board, true));
 					}
 
 					test += expandDirs[d];
@@ -763,7 +763,7 @@ namespace ChessBoard
 					continue;
 				}
 
-				res.Add(new Move(piece, test, Board));
+				res.Add(new Move(piece, test, Board, true));
 			}
 			
 			return res;
@@ -866,7 +866,7 @@ namespace ChessBoard
 				}
 				else
 				{
-					res.Add(new Move(piece, inFrontTwo, Board));
+					res.Add(new Move(piece, inFrontTwo, Board, true));
 				}
 			}
 
@@ -878,7 +878,7 @@ namespace ChessBoard
 				}
 				else
 				{
-					res.Add(new Move(piece, inFront, Board));
+					res.Add(new Move(piece, inFront, Board, true));
 				}
 			}
 		}
@@ -895,7 +895,7 @@ namespace ChessBoard
 					// en passant check
 					if (Board[ep] != null && Board[ep].Type == PieceType.Pawn && Board[ep].PawnJustMovedDouble)
 					{
-						res.Add(new Move(piece, diagonal, Board));
+						res.Add(new Move(piece, diagonal, Board, true));
 					}
 					else
 					{
@@ -908,7 +908,7 @@ namespace ChessBoard
 				}
 				else
 				{
-					res.Add(new Move(piece, diagonal, Board));
+					res.Add(new Move(piece, diagonal, Board, true));
 				}
 			}
 		}

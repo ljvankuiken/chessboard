@@ -28,13 +28,16 @@ namespace ChessBoard
 		public bool IsKingsSide
 		{ get; }
 
-		public MoveCastle(Piece king, Piece rook, Tile kingTo, Board board) : base(king, kingTo, board)
+		public MoveCastle(Piece king, Piece rook, Tile kingTo, Board board) : base(king, kingTo, board, true)
 		{
 			Rook = rook;
 
 			IsKingsSide = king.Position.Column < rook.Position.Column;
 
 			RookTo = new Tile(king.Position.Row, kingTo.Column + (IsKingsSide ? -1 : 1));
+
+			NotationAlgebraic = ToString();
+			NotationEnglish = ToStringPGN();
 		}
 
 		public override void DoMove()
@@ -46,6 +49,23 @@ namespace ChessBoard
 			Rook.HasMoved = true;
 
 			Board.AfterPieceMoved(new PieceMovedCastleEventArgs(this));
+		}
+
+		public override string ToString()
+		{
+			if (Rook.Position.Column > Piece.Position.Column)
+			{
+				return "0-0";
+			}
+			else
+			{
+				return "0-0-0";
+			}
+		}
+
+		public override string ToStringPGN()
+		{
+			return ToString().Replace('0', 'O');
 		}
 	}
 }

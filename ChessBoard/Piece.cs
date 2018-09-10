@@ -45,7 +45,7 @@ namespace ChessBoard
 		/// <summary>
 		/// Returns the chess notation position for this piece (e.g., "e5").
 		/// </summary>
-		public string ChessPos => Util.GetPosAlgebraic(Position);
+		public string ChessPos => Position.ToStringAlgebraic();
 
 		/// <summary>
 		/// Indicates whether this piece has moved.

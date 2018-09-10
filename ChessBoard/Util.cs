@@ -40,6 +40,27 @@ namespace ChessBoard
 			}
 		}
 
+		public static string Abbreviation(this PieceType type, bool english = false)
+		{
+			switch (type)
+			{
+			case PieceType.King:
+				return "K";
+			case PieceType.Queen:
+				return "Q";
+			case PieceType.Rook:
+				return "R";
+			case PieceType.Knight:
+				return "N";
+			case PieceType.Bishop:
+				return "B";
+			case PieceType.Pawn:
+				return english ? "P" : "";
+			default:
+				return "???";
+			}
+		}
+
 		public static bool IsVictory(this GameStatus status)
 		{
 			return status == GameStatus.VictoryWhite || status == GameStatus.VictoryBlack;
@@ -48,42 +69,6 @@ namespace ChessBoard
 		public static bool IsVictoryForSide(this GameStatus status, Side side)
 		{
 			return status == side.GetVictoryStatus();
-		}
-
-		public static string GetPosAlgebraic(int row, int col)
-		{
-			const string LETTERS = "abcdefgh";
-			char colChar = LETTERS[Clamp(col, 0, 7)];
-
-			return colChar.ToString() + Clamp(row + 1, 1, 8).ToString();
-		}
-		public static string GetPosAlgebraic(this Tile tile)
-		{
-			return GetPosAlgebraic(tile.Row, tile.Column);
-		}
-
-		public static string GetPosDescriptive(int row, int col, Side side = Side.White)
-		{
-			string[] COLUMNS = new string[] { "QR", "QN", "QB", "Q", "K", "KB", "KN", "KR" };
-
-			string colStr = COLUMNS[Clamp(col, 0, 7)];
-
-			int relRow = Clamp(side == Side.White ? row : 7 - row, 0, 7) + 1;
-
-			return colStr + relRow.ToString();
-		}
-		public static string GetPosDescriptive(this Tile tile, Side side = Side.White)
-		{
-			return GetPosDescriptive(tile.Row, tile.Column, side);
-		}
-
-		public static string GetPosICCF(int row, int col)
-		{
-			return (col + 1).ToString() + (row + 1).ToString();
-		}
-		public static string GetPosICCF(this Tile tile)
-		{
-			return GetPosICCF(tile.Row, tile.Column);
 		}
 
 		/// <summary>
@@ -110,6 +95,26 @@ namespace ChessBoard
 			{
 				return val;
 			}
+		}
+
+		public static bool UniqueAmongAll<TElement, TEval>(this IEnumerable<TElement> enumerable, Func<TElement, TEval> getter)
+		{
+			List<TEval> results = new List<TEval>();
+
+			foreach (TElement t in enumerable)
+			{
+				TEval eval = getter(t);
+				if (results.Contains(eval))
+				{
+					return false;
+				}
+				else
+				{
+					results.Add(eval);
+				}
+			}
+
+			return true;
 		}
 	}
 }

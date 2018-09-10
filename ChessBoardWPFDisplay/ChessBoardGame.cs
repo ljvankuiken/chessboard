@@ -41,6 +41,9 @@ namespace ChessBoardWPFDisplay
 		public bool EnforceTurns
 		{ get; set; }
 
+		public bool ShowHistory
+		{ get; set; }
+
 		public bool ShowNotationOverlay
 		{
 			get => NotationOverlay.Visible;
@@ -89,6 +92,7 @@ namespace ChessBoardWPFDisplay
 			SetUpPiecesFromBoard();
 
 			EnforceTurns = true;
+			ShowHistory = true;
 			ShowNotationOverlay = true;
 		}
 
@@ -153,6 +157,7 @@ namespace ChessBoardWPFDisplay
 			{
 				Board.Moves.Add(move);
 				move.DoMove();
+				move.AppendCheckNotation();
 
 				foreach (RenderedPiece rp in RenderedPieces)
 				{
@@ -243,10 +248,9 @@ namespace ChessBoardWPFDisplay
 			Vector2 posRel = e.GetPosition(BoardSprite.Control);
 			lines.Add("Board coords: " + posRel.ToString());
 
-			int tileX = Math.Min((int)(posRel.X / BoardSprite.ActualWidth * 8), 7);
-			int tileY = 7 - Math.Min((int)(posRel.Y / BoardSprite.ActualHeight * 8), 7);
+			Tile tile = getTile(posAbs);
 
-			lines.Add("Tile: " + Util.GetPosAlgebraic(tileY, tileX));
+			lines.Add("Tile: " + tile.ToStringAlgebraic());
 
 			if (!EnforceTurns)
 			{
@@ -270,13 +274,13 @@ namespace ChessBoardWPFDisplay
 				lines.Add("Grabbed Piece: " + GrabbedPiece.Piece.ToString());
 
 				Vector2 posCenter = GrabbedPiece.RenderedPos + GrabbedPiece.Sprite.ActualSize / 2.0;
-				Tile tile = getTile(posCenter);
+				Tile tileCenterOn = getTile(posCenter);
 
-				lines.Add("(would move to " + tile.GetPosAlgebraic() + ")");
+				lines.Add("(would move to " + tileCenterOn.ToStringAlgebraic() + ")");
 
-				if (!Board.Validator.IsMovementValid(GrabbedPiece.Piece, tile))
+				if (!Board.Validator.IsMovementValid(GrabbedPiece.Piece, tileCenterOn))
 				{
-					lines.Add("(" + Board.Validator.InvalidErrors.GetOrDefault(tile, "INVALID") + ")");
+					lines.Add("(" + Board.Validator.InvalidErrors.GetOrDefault(tileCenterOn, "INVALID") + ")");
 				}
 			}
 
@@ -299,6 +303,37 @@ namespace ChessBoardWPFDisplay
 				if (pointedAtPiece.Side != Board.Turn && EnforceTurns)
 				{
 					lines.Add($"{Board.Turn}'s turn");
+				}
+			}
+
+			if (ShowHistory)
+			{
+				lines.Add("");
+				string buffer = "";
+				foreach (Move m in Board.Moves)
+				{
+					if (EnforceTurns)
+					{
+						if (m.Piece.Side == Side.White)
+						{
+							buffer += m.NotationAlgebraic + " ";
+						}
+						else
+						{
+							buffer += m.NotationAlgebraic;
+							lines.Add(buffer);
+							buffer = "";
+						}
+					}
+					else
+					{
+						lines.Add($"{m.Piece.Side}: {m.NotationAlgebraic}");
+					}
+				}
+
+				if (EnforceTurns && buffer != "")
+				{
+					lines.Add(buffer + "...");
 				}
 			}
 

@@ -180,7 +180,7 @@ namespace ChessBoard
 			return IsThreatened(king.Position, side.Opposite());
 		}
 
-		public GameStatus CheckGameStatusForSide(Side side)
+		public GameStatus CheckIfMated(Side side)
 		{
 			List<Move> legal = Validator.GetAllLegalMoves(side);
 
@@ -201,8 +201,8 @@ namespace ChessBoard
 
 		public GameStatus CheckGameStatus()
 		{
-			GameStatus white = CheckGameStatusForSide(Side.White);
-			GameStatus black = CheckGameStatusForSide(Side.Black);
+			GameStatus white = CheckIfMated(Side.White);
+			GameStatus black = CheckIfMated(Side.Black);
 
 			if (white == GameStatus.Draw || black == GameStatus.Draw)
 			{
