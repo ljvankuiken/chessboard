@@ -76,6 +76,21 @@ namespace ChessBoard
 			return false;
 		}
 
+		public List<Move> GetAllLegalMoves(Side side)
+		{
+			List<Move> res = new List<Move>();
+
+			foreach (Piece p in Board.Pieces)
+			{
+				if (p.Side == side)
+				{
+					res.AddRange(GetValidLocations(p));
+				}
+			}
+
+			return res;
+		}
+
 		/// <summary>
 		/// Tests which moves a <see cref="Piece"/> can legally make, and returns a list of all legal ones.
 		/// Caches results to prevent lag. Cache is reset if <see cref="Piece"/> differs in 

@@ -88,7 +88,7 @@ namespace ChessBoardWPFDisplay
 
 			SetUpPiecesFromBoard();
 
-			EnforceTurns = false;
+			EnforceTurns = true;
 			ShowNotationOverlay = true;
 		}
 
@@ -262,6 +262,9 @@ namespace ChessBoardWPFDisplay
 				lines.Add("BLACK IS IN CHECK");
 			}
 
+			List<Move> allLegalMoves = Board.Validator.GetAllLegalMoves(Board.Turn);
+			lines.Add(Board.Turn.ToString() + "'s legal moves: " + allLegalMoves.Count.ToString());
+
 			if (GrabbedPiece != null)
 			{
 				lines.Add("Grabbed Piece: " + GrabbedPiece.Piece.ToString());
@@ -298,6 +301,8 @@ namespace ChessBoardWPFDisplay
 					lines.Add($"{Board.Turn}'s turn");
 				}
 			}
+
+			lines.Add("Game Status: " + Board.CheckGameStatus().ToString().ToUpper());
 
 			// ---
 

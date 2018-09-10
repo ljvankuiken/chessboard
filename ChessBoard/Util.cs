@@ -28,6 +28,28 @@ namespace ChessBoard
 			}
 		}
 
+		public static GameStatus GetVictoryStatus(this Side side)
+		{
+			if (side == Side.White)
+			{
+				return GameStatus.VictoryWhite;
+			}
+			else
+			{
+				return GameStatus.VictoryBlack;
+			}
+		}
+
+		public static bool IsVictory(this GameStatus status)
+		{
+			return status == GameStatus.VictoryWhite || status == GameStatus.VictoryBlack;
+		}
+
+		public static bool IsVictoryForSide(this GameStatus status, Side side)
+		{
+			return status == side.GetVictoryStatus();
+		}
+
 		public static string GetPosAlgebraic(int row, int col)
 		{
 			const string LETTERS = "abcdefgh";

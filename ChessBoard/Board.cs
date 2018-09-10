@@ -15,6 +15,14 @@ namespace ChessBoard
 		Black
 	}
 
+	public enum GameStatus
+	{
+		InProgress = 0,
+		VictoryWhite,
+		VictoryBlack,
+		Draw
+	}
+
 	/// <summary>
 	/// Represents a game of chess.
 	/// </summary>
@@ -170,6 +178,48 @@ namespace ChessBoard
 		{
 			Piece king = Pieces.First(p => p.Side == side && p.Type == PieceType.King);
 			return IsThreatened(king.Position, side.Opposite());
+		}
+
+		public GameStatus CheckGameStatusForSide(Side side)
+		{
+			List<Move> legal = Validator.GetAllLegalMoves(side);
+
+			if (legal.Count == 0)
+			{
+				if (IsInCheck(side))
+				{
+					return side.Opposite().GetVictoryStatus();
+				}
+				else
+				{
+					return GameStatus.Draw;
+				}
+			}
+
+			return GameStatus.InProgress;
+		}
+
+		public GameStatus CheckGameStatus()
+		{
+			GameStatus white = CheckGameStatusForSide(Side.White);
+			GameStatus black = CheckGameStatusForSide(Side.Black);
+
+			if (white == GameStatus.Draw || black == GameStatus.Draw)
+			{
+				return GameStatus.Draw;
+			}
+
+			if (white == GameStatus.VictoryBlack)
+			{
+				return GameStatus.VictoryBlack;
+			}
+
+			if (black == GameStatus.VictoryWhite)
+			{
+				return GameStatus.VictoryWhite;
+			}
+
+			return GameStatus.InProgress;
 		}
 
 		public Board DeepCopy()
