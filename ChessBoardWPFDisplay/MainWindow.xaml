@@ -11,7 +11,8 @@
         Loaded="Window_Loaded" 
         MouseMove="Window_MouseMove"
         MouseUp="Window_MouseUp"
-        KeyDown="Window_KeyDown">
+        KeyDown="Window_KeyDown"
+        Icon="img/icon_32.png">
   <Grid>
     <Canvas x:Name="GameCanvas"
             VerticalAlignment="Stretch"

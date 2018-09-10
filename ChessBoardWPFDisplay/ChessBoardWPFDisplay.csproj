@@ -141,5 +141,8 @@
   <ItemGroup>
     <Resource Include="img\notationoverlay_1024.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\icon_32.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

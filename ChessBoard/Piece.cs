@@ -11,12 +11,12 @@ namespace ChessBoard
 	/// </summary>
 	public enum PieceType
 	{
-		King = 0,
-		Queen,
-		Rook,
-		Knight,
-		Bishop,
-		Pawn,
+		King,
+		Queen = 1, // Do not reorder these. The numbers here match ICCF promotion notation codes.
+		Rook = 2,
+		Bishop = 3,
+		Knight = 4,
+		Pawn
 	}
 
 	/// <summary>

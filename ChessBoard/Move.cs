@@ -6,6 +6,16 @@ using System.Threading.Tasks;
 
 namespace ChessBoard
 {
+	public enum NotationType
+	{
+		LaymanTemporary = -1,
+		Algebraic = 0,
+		PGN,
+		English,
+		Coordinate,
+		ICCF
+	}
+
 	/// <summary>
 	/// Represents a single move in chess.
 	/// </summary>
@@ -40,6 +50,9 @@ namespace ChessBoard
 		/// </summary>
 		public Board Board
 		{ get; }
+
+		public static NotationType PreferredNotation
+		{ get; set; }
 
 		public string NotationAlgebraic
 		{ get; protected set; }
@@ -105,11 +118,27 @@ namespace ChessBoard
 
 		public override string ToString()
 		{
-			// non-standard for layman readability
-			return $"{Piece.Side} {Piece.Type}: {From.ToStringAlgebraic()}-{To.ToStringAlgebraic()}";
+			switch (PreferredNotation)
+			{
+			case NotationType.LaymanTemporary:
+				// non-standard for layman readability
+				return $"{Piece.Side} {Piece.Type}: {From.ToStringAlgebraic()}-{To.ToStringAlgebraic()}";
+			case NotationType.Algebraic:
+				return NotationAlgebraic;
+			case NotationType.PGN:
+				return ToStringPGN();
+			case NotationType.English:
+				return NotationEnglish;
+			case NotationType.Coordinate:
+				return ToStringCoordinate();
+			case NotationType.ICCF:
+				return ToStringICCF();
+			default:
+				throw new Exception("Invalid notation: " + PreferredNotation.ToString());
+			}
 		}
 
-		private string generateStringAlgebraic()
+		protected internal virtual string generateStringAlgebraic()
 		{
 			string res = To.ToStringAlgebraic();
 
@@ -126,7 +155,7 @@ namespace ChessBoard
 			if (Piece.Type != PieceType.Pawn)
 			{
 				IEnumerable<Piece> ambigOthers = Board.Pieces.Where(p => p.Type == Piece.Type && p.Side == Piece.Side);
-				if (ambigOthers.Count() > 0)
+				if (ambigOthers.Count() > 1)
 				{
 					if (ambigOthers.UniqueAmongAll(p => p.Position.Column))
 					{
@@ -148,7 +177,7 @@ namespace ChessBoard
 			return res;
 		}
 
-		private string generateStringEnglish()
+		protected internal virtual string generateStringEnglish()
 		{
 			string res = "";
 
@@ -169,7 +198,7 @@ namespace ChessBoard
 					if (Piece.Type == PieceType.Pawn)
 					{
 						IEnumerable<Piece> ambigOthers = Board.Pieces.Where(p => p.Type == PieceType.Pawn && p.Side == Piece.Side);
-						if (ambigOthers.Count() > 0)
+						if (ambigOthers.Count() > 1)
 						{
 							res = From.FileEnglishAbbrev() + res;
 						}
@@ -177,7 +206,7 @@ namespace ChessBoard
 					else
 					{
 						IEnumerable<Piece> ambigPossibleVictims = Board.Pieces.Where(p => p.Type == victim.Type && p.Side == victim.Side);
-						if (ambigPossibleVictims.Count() > 0)
+						if (ambigPossibleVictims.Count() > 1)
 						{
 							res += "/" + To.ToStringEnglish(Piece.Side);
 						}
@@ -200,7 +229,7 @@ namespace ChessBoard
 			return res;
 		}
 
-		public void AppendCheckNotation()
+		public virtual void AppendCheckNotation()
 		{
 			if (Board.CheckIfMated(Piece.Side.Opposite()) == Piece.Side.GetVictoryStatus())
 			{
@@ -216,15 +245,15 @@ namespace ChessBoard
 
 		public virtual string ToStringPGN()
 		{
-			return NotationAlgebraic; // Only difference is promotions, which are not implemented yet.
+			return NotationAlgebraic;
 		}
 
-		public string ToStringCoordinate()
+		public virtual string ToStringCoordinate()
 		{
 			return From.ToStringCoordinate() + "-" + To.ToStringCoordinate();
 		}
 
-		public string ToStringICCF()
+		public virtual string ToStringICCF()
 		{
 			return From.ToStringICCF() + To.ToStringICCF();
 		}

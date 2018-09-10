@@ -85,6 +85,8 @@ namespace ChessBoardWPFDisplay
 
 			Sprites.Add(BoardSprite);
 			Sprites.Add(NotationOverlay);
+
+			Move.PreferredNotation = NotationType.PGN;
 			
 			Board = new Board();
 			Board.OnPieceMoved += onPieceMoved;
@@ -93,7 +95,7 @@ namespace ChessBoardWPFDisplay
 
 			EnforceTurns = true;
 			ShowHistory = true;
-			ShowNotationOverlay = true;
+			ShowNotationOverlay = false;
 		}
 
 		public override void Initialize(RoutedEventArgs e)
@@ -289,7 +291,7 @@ namespace ChessBoardWPFDisplay
 				Vector2 posCenter = GrabbedPiece.RenderedPos + GrabbedPiece.Sprite.ActualSize / 2.0;
 				Tile tileCenterOn = getTile(posCenter);
 
-				lines.Add("(would move to " + tileCenterOn.ToStringAlgebraic() + ")");
+				lines.Add("(would move to " + tileCenterOn.ToString() + ")");
 
 				if (!Board.Validator.IsMovementValid(GrabbedPiece.Piece, tileCenterOn))
 				{
@@ -319,6 +321,8 @@ namespace ChessBoardWPFDisplay
 				}
 			}
 
+			GameStatus status = Board.CheckGameStatus();
+
 			if (ShowHistory)
 			{
 				lines.Add("");
@@ -329,28 +333,35 @@ namespace ChessBoardWPFDisplay
 					{
 						if (m.Piece.Side == Side.White)
 						{
-							buffer += m.NotationAlgebraic + " ";
+							buffer += m.ToString() + " ";
 						}
 						else
 						{
-							buffer += m.NotationAlgebraic;
+							buffer += m.ToString();
 							lines.Add(buffer);
 							buffer = "";
 						}
 					}
 					else
 					{
-						lines.Add($"{m.Piece.Side}: {m.NotationAlgebraic}");
+						lines.Add($"{m.Piece.Side}: {m.ToString()}");
 					}
 				}
 
 				if (EnforceTurns && buffer != "")
 				{
-					lines.Add(buffer + "...");
+					if (status == GameStatus.InProgress)
+					{
+						lines.Add(buffer + "...");
+					}
+					else
+					{
+						lines.Add(buffer + "    ");
+					}
 				}
 			}
 
-			lines.Add("Game Status: " + Board.CheckGameStatus().ToString().ToUpper());
+			lines.Add("Game Status: " + status.ToString().ToUpper());
 
 			// ---
 
