@@ -6,20 +6,38 @@ using System.Threading.Tasks;
 
 namespace ChessBoard
 {
+	/// <summary>
+	/// Represents a single move in chess.
+	/// </summary>
 	public class Move
 	{
+		/// <summary>
+		/// <see cref="Piece"/> being moved.
+		/// </summary>
 		public Piece Piece
 		{ get; }
 
+		/// <summary>
+		/// <see cref="Tile"/> piece moved from.
+		/// </summary>
 		public Tile From
 		{ get; }
 
+		/// <summary>
+		/// <see cref="Tile"/> piece moved to.
+		/// </summary>
 		public Tile To
 		{ get; }
 
+		/// <summary>
+		/// Whether the move is a capture or not. Includes en passant.
+		/// </summary>
 		public bool IsCapture
 		{ get; }
 
+		/// <summary>
+		/// <see cref="Board"/> on which the move takes place.
+		/// </summary>
 		public Board Board
 		{ get; }
 
@@ -40,6 +58,9 @@ namespace ChessBoard
 			}
 		}
 
+		/// <summary>
+		/// Activates the move on the <see cref="Board"/>. Should only ever be called once.
+		/// </summary>
 		public virtual void DoMove()
 		{
 			// En passant capture
@@ -47,12 +68,10 @@ namespace ChessBoard
 			if (Piece.Type == PieceType.Pawn && diff.Abs() == Tile.UnitRC && Board[To] == null)
 			{
 				Tile victim = From + diff.ColumnOnly;
-				Board[victim] = null;
+				Board.RemoveAt(victim);
 			}
-
-			Board[Piece.Position] = null;
+			
 			Board[To] = Piece;
-			Piece.Position = To;
 			Piece.HasMoved = true;
 
 			Board.AfterPieceMoved(new PieceMovedEventArgs(this));

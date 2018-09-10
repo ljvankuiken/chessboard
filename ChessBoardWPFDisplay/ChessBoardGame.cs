@@ -20,7 +20,7 @@ namespace ChessBoardWPFDisplay
 		public double Scale
 		{ get; private set; }
 
-		public List<RenderedPiece> Pieces
+		public List<RenderedPiece> RenderedPieces
 		{ get; } = new List<RenderedPiece>();
 
 		public RenderedPiece GrabbedPiece
@@ -43,7 +43,7 @@ namespace ChessBoardWPFDisplay
 			get => _debugMode;
 			set
 			{
-				foreach (RenderedPiece rp in Pieces)
+				foreach (RenderedPiece rp in RenderedPieces)
 				{
 					rp.ShowDebug = value;
 					rp.Refresh();
@@ -84,7 +84,7 @@ namespace ChessBoardWPFDisplay
 		{
 			BoardSprite.Initialize();
 
-			foreach (RenderedPiece rp in Pieces)
+			foreach (RenderedPiece rp in RenderedPieces)
 			{
 				rp.Initialize();
 			}
@@ -94,13 +94,13 @@ namespace ChessBoardWPFDisplay
 
 		public void SetUpPiecesFromBoard()
 		{
-			Pieces.Clear();
+			RenderedPieces.Clear();
 
 			foreach (Piece p in Board.Pieces)
 			{
 				if (p != null)
 				{
-					Pieces.Add(new RenderedPiece(p, BoardSprite, Canvas));
+					RenderedPieces.Add(new RenderedPiece(p, BoardSprite, Canvas));
 				}
 			}
 		}
@@ -141,7 +141,7 @@ namespace ChessBoardWPFDisplay
 				Board.Moves.Add(move);
 				move.DoMove();
 
-				foreach (RenderedPiece rp in Pieces)
+				foreach (RenderedPiece rp in RenderedPieces)
 				{
 					rp.RenderedPos = getAbsCoords(rp.Piece.Position);
 					rp.Refresh();
@@ -290,16 +290,17 @@ namespace ChessBoardWPFDisplay
 		private void onPieceMoved(object sender, PieceMovedEventArgs e)
 		{
 			// Remove captured pieces
-			for (int i = Pieces.Count - 1; i >= 0; i--)
+			for (int i = RenderedPieces.Count - 1; i >= 0; i--)
 			{
-				RenderedPiece rp = Pieces[i];
+				RenderedPiece rp = RenderedPieces[i];
 				if (!Board.Pieces.Contains(rp.Piece))
 				{
 					rp.Disconnect(Canvas);
-					Pieces.RemoveAt(i);
+					RenderedPieces.RemoveAt(i);
 				}
 			}
 
+			Board.Validator.ResetCache();
 			Board.SwitchTurn();
 		}
 	}

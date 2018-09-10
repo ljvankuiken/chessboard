@@ -39,7 +39,7 @@ namespace ChessBoardWPFDisplay
 		{
 			if (e.ChangedButton == MouseButton.Left)
 			{
-				foreach (RenderedPiece p in ChessWrapper.Pieces)
+				foreach (RenderedPiece p in ChessWrapper.RenderedPieces)
 				{
 					if (p.Sprite.ActualBounds.Contains(e.GetPositionV()))
 					{

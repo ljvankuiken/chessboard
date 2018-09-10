@@ -6,11 +6,20 @@ using System.Threading.Tasks;
 
 namespace ChessBoard
 {
+	/// <summary>
+	/// Used to validate moves as legal or not.
+	/// </summary>
 	public class MovementValidator
 	{
+		/// <summary>
+		/// Board on which to check moves.
+		/// </summary>
 		public Board Board
 		{ get; }
 
+		/// <summary>
+		/// A <see cref="Dictionary{TKey, TValue}"/> of invalid <see cref="Tile"/>s and the reasons for which they are invalid.
+		/// </summary>
 		public Dictionary<Tile, string> InvalidErrors
 		{ get; } = new Dictionary<Tile, string>();
 
@@ -23,6 +32,12 @@ namespace ChessBoard
 			Board = board;
 		}
 
+		/// <summary>
+		/// Tests whether a <see cref="Piece"/> can legally move to a given <see cref="Tile"/>.
+		/// </summary>
+		/// <param name="piece">The piece tested.</param>
+		/// <param name="target">The target location.</param>
+		/// <returns><see cref="true"/> if the move is legal, <see cref="false"/> otherwise.</returns>
 		public bool IsMovementValid(Piece piece, Tile target)
 		{
 			List<Move> valid = GetValidLocations(piece);
@@ -30,6 +45,17 @@ namespace ChessBoard
 			return valid == null || valid.Exists(m => m.To == target);
 		}
 
+		/// <summary>
+		/// Tests whether a <see cref="Piece"/> can legally move to a given <see cref="Tile"/>, and includes
+		/// the <see cref="Move"/> needed to do so.
+		/// </summary>
+		/// <param name="piece">The piece tested.</param>
+		/// <param name="target">The target location.</param>
+		/// <param name="validated">
+		/// The outputted <see cref="Move"/> needed to move the <see cref="piece"/> to the <see cref="target"/> tile,
+		/// or null if the move is illegal.
+		/// </param>
+		/// <returns><see cref="true"/> if the move is legal, <see cref="false"/> otherwise.</returns>
 		public bool IsMovementValid(Piece piece, Tile target, out Move validated)
 		{
 			List<Move> valid = GetValidLocations(piece);
@@ -47,6 +73,15 @@ namespace ChessBoard
 			return false;
 		}
 
+		/// <summary>
+		/// Tests which moves a <see cref="Piece"/> can legally make, and returns a list of all legal ones.
+		/// Caches results to prevent lag. Cache is reset if <see cref="Piece"/> differs in 
+		/// <see cref="Side"/> or <see cref="PieceType"/>.
+		/// </summary>
+		/// <param name="piece">The piece tested.</param>
+		/// <returns>
+		/// A list of all legal moves <paramref name="piece"/> can make, or null if no restrictions are made.
+		/// </returns>
 		public List<Move> GetValidLocations(Piece piece)
 		{
 			if (_validCache != null && piece.Type == _cachedType && piece.Position == _cachedPosition)
@@ -55,8 +90,7 @@ namespace ChessBoard
 			}
 			else
 			{
-				_validCache = null;
-				InvalidErrors.Clear();
+				ResetCache();
 			}
 
 			_cachedPosition = piece.Position;
@@ -65,23 +99,33 @@ namespace ChessBoard
 			switch (piece.Type)
 			{
 			case PieceType.King:
-				return GetValidKingLocations(piece);
+				return getValidKingLocations(piece);
 			case PieceType.Pawn:
-				return GetValidPawnLocations(piece);
+				return getValidPawnLocations(piece);
 			case PieceType.Knight:
-				return GetValidKnightLocations(piece);
+				return getValidKnightLocations(piece);
 			case PieceType.Bishop:
-				return GetValidBishopLocations(piece);
+				return getValidBishopLocations(piece);
 			case PieceType.Rook:
-				return GetValidRookLocations(piece);
+				return getValidRookLocations(piece);
 			case PieceType.Queen:
-				return GetValidQueenLocations(piece);
+				return getValidQueenLocations(piece);
 			default:
 				throw new ArgumentException("Piece must be from chess.", nameof(piece));
 			}
 		}
 
-		public List<Move> GetValidKingLocations(Piece piece)
+		/// <summary>
+		/// Resets the internal cache so that the next time <see cref="GetValidLocations(Piece)"/> is called,
+		/// the piece is fully tested. Should only be manually called after a move is made.
+		/// </summary>
+		public void ResetCache()
+		{
+			_validCache = null;
+			InvalidErrors.Clear();
+		}
+
+		private List<Move> getValidKingLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.King)
 			{
@@ -237,7 +281,7 @@ namespace ChessBoard
 			#endregion KS CASTLE
 		}
 
-		public List<Move> GetValidQueenLocations(Piece piece)
+		private List<Move> getValidQueenLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.Queen)
 			{
@@ -290,7 +334,7 @@ namespace ChessBoard
 			return res;
 		}
 
-		public List<Move> GetValidRookLocations(Piece piece)
+		private List<Move> getValidRookLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.Rook)
 			{
@@ -339,7 +383,7 @@ namespace ChessBoard
 			return res;
 		}
 
-		public List<Move> GetValidBishopLocations(Piece piece)
+		private List<Move> getValidBishopLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.Bishop)
 			{
@@ -388,7 +432,7 @@ namespace ChessBoard
 			return res;
 		}
 
-		public List<Move> GetValidKnightLocations(Piece piece)
+		private List<Move> getValidKnightLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.Knight)
 
@@ -435,7 +479,7 @@ namespace ChessBoard
 			return res;
 		}
 
-		public List<Move> GetValidPawnLocations(Piece piece)
+		private List<Move> getValidPawnLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.Pawn)
 			{

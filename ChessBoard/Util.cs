@@ -8,6 +8,14 @@ namespace ChessBoard
 {
 	public static class Util
 	{
+		/// <summary>
+		/// Returns the opposite of a given <see cref="Side"/>.
+		/// </summary>
+		/// <param name="side">Side to mirror.</param>
+		/// <returns>
+		/// <see cref="Side.White"/> if <paramref name="side"/> is <see cref="Side.Black"/>,
+		/// <see cref="Side.Black"/> if <paramref name="side"/> is <see cref="Side.White"/>.
+		/// </returns>
 		public static Side Opposite(this Side side)
 		{
 			if (side == Side.White)
@@ -56,6 +64,16 @@ namespace ChessBoard
 			return GetPosICCF(tile.Row, tile.Column);
 		}
 
+		/// <summary>
+		/// Clamps an integer between two values.
+		/// </summary>
+		/// <param name="val">The value to clamp.</param>
+		/// <param name="min">The minimum the result can be.</param>
+		/// <param name="max">The maximum the result can be.</param>
+		/// <returns>
+		/// <paramref name="val"/> if it is inside the given range, or 
+		/// <paramref name="min"/> or <paramref name="max"/> if not.
+		/// </returns>
 		public static int Clamp(int val, int min, int max)
 		{
 			if (val < min)

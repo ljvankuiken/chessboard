@@ -6,58 +6,57 @@ using System.Threading.Tasks;
 
 namespace ChessBoard
 {
+	/// <summary>
+	/// Represents one of the two playable sides of chess. Used to define the side of pieces and turns.
+	/// </summary>
 	public enum Side
 	{
 		White,
 		Black
 	}
 
+	/// <summary>
+	/// Represents a game of chess.
+	/// </summary>
     public class Board
     {
-		[Obsolete]
-		public Piece[,] Layout
-		{ get; } = new Piece[8, 8];
-
+		/// <summary>
+		/// Object to test validity of potential moves.
+		/// </summary>
 		public MovementValidator Validator
 		{ get; }
 
+		/// <summary>
+		/// Side who's turn it is. Initialized to <see cref="Side.White"/>.
+		/// </summary>
 		public Side Turn
 		{ get; private set; }
 
+		/// <summary>
+		/// List of all moves taken, by both sides.
+		/// </summary>
 		public List<Move> Moves
 		{ get; } = new List<Move>();
 
 		/// <summary>
-		/// Condensed list of all pieces on board. Attempting to modify pieces from here does nothing.
+		/// All pieces on board. Null items should not be allowed here.
 		/// </summary>
 		public List<Piece> Pieces
 		{ get; } = new List<Piece>();
-		//{
-		//	get
-		//	{
-		//		List<Piece> res = new List<Piece>();
-		//		foreach (Piece p in Layout)
-		//		{
-		//			if (p != null)
-		//			{
-		//				res.Add(p);
-		//			}
-		//		}
-		//
-		//		return res;
-		//	}
-		//}
 
 		public event PieceMovedEventHandler OnPieceMoved;
 
 		public Piece this[int row, int col]
 		{
-			//get => Layout[row, col];
-			//set => Layout[row, col] = value;
 			get => this[new Tile(row, col)];
 			set => this[new Tile(row, col)] = value;
 		}
-
+		
+		/// <summary>
+		/// Accesses <see cref="Pieces"/> by location. Setting a location removes and replaces the <see cref="Piece"/> already there.
+		/// </summary>
+		/// <param name="tile">Location to access.</param>
+		/// <returns>Piece at location, or null if no piece is found.</returns>
 		public Piece this[Tile tile]
 		{
 			get
@@ -72,8 +71,9 @@ namespace ChessBoard
 
 				return null;
 			}
-			set
+			internal set
 			{
+				// Remove replaced piece
 				for (int i = Pieces.Count - 1; i >= 0; i--)
 				{
 					if (Pieces[i].Position == tile)
@@ -84,10 +84,13 @@ namespace ChessBoard
 
 				if (value != null)
 				{
+					// Add piece if not already present
 					if (!Pieces.Contains(value))
 					{
 						Pieces.Add(value);
 					}
+
+					// Update position
 					value.Position = tile;
 				}
 			}
@@ -100,41 +103,22 @@ namespace ChessBoard
 			Reset();
 		}
 
+		/// <summary>
+		/// Switches whose turn it is to the opposite side. Should be called after every move.
+		/// </summary>
 		public void SwitchTurn()
 		{
 			Turn = Turn.Opposite();
 		}
 
+		/// <summary>
+		/// Resets the board to its initial status. Clears moves.
+		/// </summary>
 		public void Reset()
 		{
 			Moves.Clear();
 
 			Pieces.Clear();
-			//for (int i = 0; i < 8; i++)
-			//{
-			//	for (int j = 0; i < 8; i++)
-			//	{
-			//		Layout[i, j] = null;
-			//	}
-			//}
-
-			//Layout[0, 0] = new Piece(PieceType.Rook,	Side.White, new Tile(0, 0), this);
-			//Layout[0, 1] = new Piece(PieceType.Knight,	Side.White, new Tile(0, 1), this);
-			//Layout[0, 2] = new Piece(PieceType.Bishop,	Side.White, new Tile(0, 2), this);
-			//Layout[0, 3] = new Piece(PieceType.Queen,	Side.White, new Tile(0, 3), this);
-			//Layout[0, 4] = new Piece(PieceType.King,	Side.White, new Tile(0, 4), this);
-			//Layout[0, 5] = new Piece(PieceType.Bishop,	Side.White, new Tile(0, 5), this);
-			//Layout[0, 6] = new Piece(PieceType.Knight,	Side.White, new Tile(0, 6), this);
-			//Layout[0, 7] = new Piece(PieceType.Rook,	Side.White, new Tile(0, 7), this);
-			//
-			//Layout[7, 0] = new Piece(PieceType.Rook,	Side.Black, new Tile(7, 0), this);
-			//Layout[7, 1] = new Piece(PieceType.Knight,	Side.Black, new Tile(7, 1), this);
-			//Layout[7, 2] = new Piece(PieceType.Bishop,	Side.Black, new Tile(7, 2), this);
-			//Layout[7, 3] = new Piece(PieceType.Queen,	Side.Black, new Tile(7, 3), this);
-			//Layout[7, 4] = new Piece(PieceType.King,	Side.Black, new Tile(7, 4), this);
-			//Layout[7, 5] = new Piece(PieceType.Bishop,	Side.Black, new Tile(7, 5), this);
-			//Layout[7, 6] = new Piece(PieceType.Knight,	Side.Black, new Tile(7, 6), this);
-			//Layout[7, 7] = new Piece(PieceType.Rook,	Side.Black, new Tile(7, 7), this);
 
 			Pieces.Add(new Piece(PieceType.Rook,	Side.White, new Tile(0, 0), this));
 			Pieces.Add(new Piece(PieceType.Knight,	Side.White, new Tile(0, 1), this));
@@ -156,13 +140,27 @@ namespace ChessBoard
 
 			for (int col = 0; col < 8; col++)
 			{
-				//Layout[1, col] = new Piece(PieceType.Pawn, Side.White, new Tile(1, col), this);
-				//Layout[6, col] = new Piece(PieceType.Pawn, Side.Black, new Tile(6, col), this);
 				Pieces.Add(new Piece(PieceType.Pawn, Side.White, new Tile(1, col), this));
 				Pieces.Add(new Piece(PieceType.Pawn, Side.Black, new Tile(6, col), this));
 			}
 
 			Turn = Side.White;
+		}
+		
+		internal void RemoveAt(Tile tile)
+		{
+			for (int i = Pieces.Count - 1; i >= 0; i--)
+			{
+				if (Pieces[i].Position == tile)
+				{
+					Pieces.RemoveAt(i);
+				}
+			}
+		}
+
+		internal void Remove(Piece piece)
+		{
+			Pieces.Remove(piece);
 		}
 
 		internal void AfterPieceMoved(PieceMovedEventArgs e)

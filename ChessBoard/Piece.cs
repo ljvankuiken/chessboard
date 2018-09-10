@@ -28,7 +28,7 @@ namespace ChessBoard
 		/// The zero-indexed column and row values for the piece's position. 0-7 are valid within this.
 		/// </summary>
 		public Tile Position
-		{ get; set; }
+		{ get; internal set; }
 
 		/// <summary>
 		/// The type of this piece.

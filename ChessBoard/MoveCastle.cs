@@ -39,12 +39,6 @@ namespace ChessBoard
 
 		public override void DoMove()
 		{
-			Board[Piece.Position] = null;
-			Board[Rook.Position] = null;
-
-			Board[To] = Piece;
-			Board[RookTo] = Rook;
-
 			Piece.Position = To;
 			Rook.Position = RookTo;
 
