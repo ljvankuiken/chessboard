@@ -866,7 +866,7 @@ namespace ChessBoard
 				}
 				else
 				{
-					res.Add(new Move(piece, inFrontTwo, Board, true));
+					res.Add(createPawnMove(piece, inFrontTwo));
 				}
 			}
 
@@ -878,7 +878,7 @@ namespace ChessBoard
 				}
 				else
 				{
-					res.Add(new Move(piece, inFront, Board, true));
+					res.Add(createPawnMove(piece, inFront));
 				}
 			}
 		}
@@ -895,7 +895,7 @@ namespace ChessBoard
 					// en passant check
 					if (Board[ep] != null && Board[ep].Type == PieceType.Pawn && Board[ep].PawnJustMovedDouble)
 					{
-						res.Add(new Move(piece, diagonal, Board, true));
+						res.Add(createPawnMove(piece, diagonal));
 					}
 					else
 					{
@@ -908,7 +908,7 @@ namespace ChessBoard
 				}
 				else
 				{
-					res.Add(new Move(piece, diagonal, Board, true));
+					res.Add(createPawnMove(piece, diagonal));
 				}
 			}
 		}
@@ -932,6 +932,19 @@ namespace ChessBoard
 				{
 					res.Add(diagonal);
 				}
+			}
+		}
+
+		private Move createPawnMove(Piece piece, Tile tileTo)
+		{
+			int promotionRow = piece.Side == Side.White ? 7 : 0;
+			if (tileTo.Row == promotionRow)
+			{
+				return new MovePromotion(piece, tileTo, Board);
+			}
+			else
+			{
+				return new Move(piece, tileTo, Board, true);
 			}
 		}
 	}

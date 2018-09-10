@@ -53,7 +53,7 @@ namespace ChessBoard
 
 		public override string ToString()
 		{
-			if (Rook.Position.Column > Piece.Position.Column)
+			if (IsKingsSide)
 			{
 				return "0-0";
 			}

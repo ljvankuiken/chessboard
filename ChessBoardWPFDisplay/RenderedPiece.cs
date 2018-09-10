@@ -47,7 +47,6 @@ namespace ChessBoardWPFDisplay
 			RenderedPos = new Vector2(x, y);
 			
 			Sprite = new Sprite(canvas, GetImgPath(Piece.Type, Piece.Side), RenderedPos, BoardSprite.Scale);
-			Sprite.Control.Tag = Piece.ToString();
 			Panel.SetZIndex(Sprite.Control, 10);
 
 			DebugCenterDot = new Ellipse() {
@@ -85,6 +84,13 @@ namespace ChessBoardWPFDisplay
 		{
 			return "img/qualitypieces/" + type.ToString().ToLower() + "_" + 
 				side.ToString().ToLower() + ".png";
+		}
+
+		public void ChangePiece(PieceType type, Side side, Canvas canvas)
+		{
+			canvas.Children.Remove(Sprite.Control);
+			Sprite = new Sprite(canvas, GetImgPath(type, side), RenderedPos, BoardSprite.Scale);
+			Panel.SetZIndex(Sprite.Control, 10);
 		}
 
 		public void Initialize()

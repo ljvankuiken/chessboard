@@ -156,8 +156,29 @@ namespace ChessBoardWPFDisplay
 			if (Board.Validator.IsMovementValid(GrabbedPiece.Piece, tile, out Move move))
 			{
 				Board.Moves.Add(move);
+				if (move is MovePromotion mpPre)
+				{
+					MessageBoxResult mbr = MessageBox.Show("Would you like to promote to queen or knight? Yes for queen, no for knight.", 
+						"Promotions", MessageBoxButton.YesNo);
+					if (mbr == MessageBoxResult.No)
+					{
+						mpPre.Promotion = PieceType.Knight;
+					}
+					else
+					{
+						mpPre.Promotion = PieceType.Queen;
+					}
+
+				}
+
 				move.DoMove();
 				move.AppendCheckNotation();
+
+				if (move is MovePromotion mpPost)
+				{
+					RenderedPiece promoted = RenderedPieces.First(rp => rp.Piece == move.Piece);
+					promoted.ChangePiece(mpPost.Promotion, mpPost.Piece.Side, Canvas);
+				}
 
 				foreach (RenderedPiece rp in RenderedPieces)
 				{

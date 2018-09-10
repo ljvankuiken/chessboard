@@ -125,7 +125,7 @@ namespace ChessBoard
 
 			if (Piece.Type != PieceType.Pawn)
 			{
-				IEnumerable<Piece> ambigOthers = Board.Pieces.Where(p => p != Piece && p.Type == Piece.Type && p.Side == Piece.Side);
+				IEnumerable<Piece> ambigOthers = Board.Pieces.Where(p => p.Type == Piece.Type && p.Side == Piece.Side);
 				if (ambigOthers.Count() > 0)
 				{
 					if (ambigOthers.UniqueAmongAll(p => p.Position.Column))
@@ -168,7 +168,7 @@ namespace ChessBoard
 					// Regular capture
 					if (Piece.Type == PieceType.Pawn)
 					{
-						IEnumerable<Piece> ambigOthers = Board.Pieces.Where(p => p != Piece && p.Type == PieceType.Pawn && p.Side == Piece.Side);
+						IEnumerable<Piece> ambigOthers = Board.Pieces.Where(p => p.Type == PieceType.Pawn && p.Side == Piece.Side);
 						if (ambigOthers.Count() > 0)
 						{
 							res = From.FileEnglishAbbrev() + res;
@@ -176,7 +176,7 @@ namespace ChessBoard
 					}
 					else
 					{
-						IEnumerable<Piece> ambigPossibleVictims = Board.Pieces.Where(p => p != victim && p.Type == victim.Type && p.Side == victim.Side);
+						IEnumerable<Piece> ambigPossibleVictims = Board.Pieces.Where(p => p.Type == victim.Type && p.Side == victim.Side);
 						if (ambigPossibleVictims.Count() > 0)
 						{
 							res += "/" + To.ToStringEnglish(Piece.Side);

@@ -45,6 +45,7 @@
     <Compile Include="Move.cs" />
     <Compile Include="MoveCastle.cs" />
     <Compile Include="MovementValidator.cs" />
+    <Compile Include="MovePromotion.cs" />
     <Compile Include="Piece.cs" />
     <Compile Include="PieceMovedEventHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
