@@ -68,6 +68,11 @@ namespace ChessBoardWPFDisplay
 
 		private void Window_KeyDown(object sender, KeyEventArgs e)
 		{
+			if (e.Key == Key.F1)
+			{
+				ChessWrapper.ShowNotationOverlay = !ChessWrapper.ShowNotationOverlay;
+			}
+
 			if (e.Key == Key.F3)
 			{
 				ChessWrapper.DebugMode = !ChessWrapper.DebugMode;

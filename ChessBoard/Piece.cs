@@ -98,6 +98,11 @@ namespace ChessBoard
 			return Side.ToString() + " " + Type.ToString() + " at " + ChessPos;
 		}
 
+		public Piece Clone(Board board)
+		{
+			return new Piece(Type, Side, Position, board);
+		}
+
 		internal void AfterPieceMoved(object sender, PieceMovedEventArgs e)
 		{
 			if (e.Piece == this)

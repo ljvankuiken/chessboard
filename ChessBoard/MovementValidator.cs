@@ -17,6 +17,9 @@ namespace ChessBoard
 		public Board Board
 		{ get; }
 
+		public bool BypassingCheck
+		{ get; private set; }
+
 		/// <summary>
 		/// A <see cref="Dictionary{TKey, TValue}"/> of invalid <see cref="Tile"/>s and the reasons for which they are invalid.
 		/// </summary>
@@ -82,37 +85,105 @@ namespace ChessBoard
 		/// <returns>
 		/// A list of all legal moves <paramref name="piece"/> can make, or null if no restrictions are made.
 		/// </returns>
-		public List<Move> GetValidLocations(Piece piece)
+		public List<Move> GetValidLocations(Piece piece, bool bypassCheck = false)
 		{
-			if (_validCache != null && piece.Type == _cachedType && piece.Position == _cachedPosition)
+			BypassingCheck = bypassCheck;
+
+			if (_validCache != null && piece.Type == _cachedType && piece.Position == _cachedPosition && !BypassingCheck)
 			{
 				return _validCache;
 			}
-			else
+			else if (!BypassingCheck)
 			{
 				ResetCache();
+				_cachedPosition = piece.Position;
+				_cachedType = piece.Type;
 			}
 
-			_cachedPosition = piece.Position;
-			_cachedType = piece.Type;
+
+			List<Move> res = null;
+			switch (piece.Type)
+			{
+			case PieceType.King:
+				res = getValidKingLocations(piece);
+				break;
+			case PieceType.Pawn:
+				res = getValidPawnLocations(piece);
+				break;
+			case PieceType.Knight:
+				res = getValidKnightLocations(piece);
+				break;
+			case PieceType.Bishop:
+				res = getValidBishopLocations(piece);
+				break;
+			case PieceType.Rook:
+				res = getValidRookLocations(piece);
+				break;
+			case PieceType.Queen:
+				res = getValidQueenLocations(piece);
+				break;
+			default:
+				throw new ArgumentException("Piece must be from chess.", nameof(piece));
+			}
+
+			//if (!BypassingCheck)
+			//{
+			//	for (int i = res.Count - 1; i >= 0; i--)
+			//	{
+			//		Move m = res[i];
+			//
+			//		if (WouldLeaveInCheck(m, piece.Side))
+			//		{
+			//			res.RemoveAt(i);
+			//			addError(m.To, "STILL IN CHECK");
+			//		}
+			//	}
+			//}
+
+			_validCache = res;
+
+			return res;
+		}
+
+		public List<Tile> GetThreatenedTiles(Piece piece)
+		{
+			List<Tile> res = new List<Tile>();
 
 			switch (piece.Type)
 			{
 			case PieceType.King:
-				return getValidKingLocations(piece);
+				res = getThreatenedKingLocations(piece);
+				break;
 			case PieceType.Pawn:
-				return getValidPawnLocations(piece);
+				res = getThreatenedPawnLocations(piece);
+				break;
 			case PieceType.Knight:
-				return getValidKnightLocations(piece);
+				res = getThreatenedKnightLocations(piece);
+				break;
 			case PieceType.Bishop:
-				return getValidBishopLocations(piece);
+				res = getThreatenedBishopLocations(piece);
+				break;
 			case PieceType.Rook:
-				return getValidRookLocations(piece);
+				res = getThreatenedRookLocations(piece);
+				break;
 			case PieceType.Queen:
-				return getValidQueenLocations(piece);
+				res = getThreatenedQueenLocations(piece);
+				break;
 			default:
 				throw new ArgumentException("Piece must be from chess.", nameof(piece));
 			}
+
+			return res;
+		}
+
+		public bool WouldLeaveInCheck(Move moveOriginal, Side side)
+		{
+			Board future = Board.DeepCopy();
+			Move moveTested = moveOriginal.DeepCopy(future);
+			future.Moves.Add(moveTested);
+			moveTested.DoMove();
+		
+			return Board.IsInCheck(side);
 		}
 
 		/// <summary>
@@ -123,6 +194,19 @@ namespace ChessBoard
 		{
 			_validCache = null;
 			InvalidErrors.Clear();
+		}
+
+		private void addError(Tile tile, string error)
+		{
+			if (!BypassingCheck)
+			{
+				try
+				{
+					InvalidErrors.Add(tile, error);
+				}
+				catch (ArgumentException) // Skip duplicates, that's ok.
+				{ }
+			}
 		}
 
 		private List<Move> getValidKingLocations(Piece piece)
@@ -142,20 +226,20 @@ namespace ChessBoard
 
 					if (!test.IsValid)
 					{
-						InvalidErrors.Add(test, "OFF BOARD");
+						addError(test, "OFF BOARD");
 						continue;
 					}
 
 					if (test == piece.Position)
 					{
-						InvalidErrors.Add(test, "ORIGINAL POSITION");
+						addError(test, "ORIGINAL POSITION");
 						continue;
 					}
 
 					Piece targetPiece = Board[test];
 					if (targetPiece != null && targetPiece.Side == piece.Side)
 					{
-						InvalidErrors.Add(test, "OCCUPIED");
+						addError(test, "OCCUPIED");
 						continue;
 					}
 
@@ -163,9 +247,11 @@ namespace ChessBoard
 				}
 			}
 
-			checkCastling(piece, res);
-
-			_validCache = res;
+			if (!BypassingCheck)
+			{
+				checkCastling(piece, res);
+			}
+			
 			return res;
 		}
 
@@ -178,6 +264,13 @@ namespace ChessBoard
 			{
 				InvalidErrors.Add(qsCastle, "KING MOVED");
 				InvalidErrors.Add(ksCastle, "KING MOVED");
+				return;
+			}
+
+			if (Board.IsThreatened(piece.Position, piece.Side.Opposite()))
+			{
+				InvalidErrors.Add(qsCastle, "KING IN CHECK");
+				InvalidErrors.Add(ksCastle, "KING IN CHECK");
 				return;
 			}
 
@@ -204,19 +297,30 @@ namespace ChessBoard
 			{
 				if (!qsRook.HasMoved)
 				{
-					bool allClear = true;
+					bool allClearPieces = true;
+					bool allClearCheck = true;
 					for (int i = qsRook.Position.Column + 1; i < piece.Position.Column; i++)
 					{
 						if (Board[row, i] != null)
 						{
-							allClear = false;
+							allClearPieces = false;
+							break;
+						}
+
+						if (i >= qsCastle.Column && Board.IsThreatened(new Tile(row, i), piece.Side.Opposite()))
+						{
+							allClearCheck = false;
 							break;
 						}
 					}
 
-					if (allClear)
+					if (allClearPieces && allClearCheck)
 					{
 						res.Add(new MoveCastle(piece, qsRook, qsCastle, Board));
+					}
+					else if (!allClearCheck)
+					{
+						InvalidErrors.Add(qsCastle, "THREATENED");
 					}
 					else
 					{
@@ -250,19 +354,30 @@ namespace ChessBoard
 			{
 				if (!ksRook.HasMoved)
 				{
-					bool allClear = true;
+					bool allClearPieces = true;
+					bool allClearCheck = true;
 					for (int i = piece.Position.Column + 1; i < ksRook.Position.Column; i++)
 					{
 						if (Board[row, i] != null)
 						{
-							allClear = false;
+							allClearPieces = false;
+							break;
+						}
+
+						if (i <= ksCastle.Column && Board.IsThreatened(new Tile(row, i), piece.Side.Opposite()))
+						{
+							allClearCheck = false;
 							break;
 						}
 					}
 
-					if (allClear)
+					if (allClearPieces && allClearCheck)
 					{
 						res.Add(new MoveCastle(piece, ksRook, ksCastle, Board));
+					}
+					else if (!allClearCheck)
+					{
+						InvalidErrors.Add(ksCastle, "THREATENED");
 					}
 					else
 					{
@@ -281,6 +396,39 @@ namespace ChessBoard
 			#endregion KS CASTLE
 		}
 
+		private List<Tile> getThreatenedKingLocations(Piece piece)
+		{
+			if (piece.Type != PieceType.King)
+			{
+				throw new ArgumentException("Piece must be king.", nameof(piece));
+			}
+
+			List<Tile> res = new List<Tile>();
+
+			for (int row = piece.Position.Row - 1; row <= piece.Position.Row + 1; row++)
+			{
+				for (int col = piece.Position.Column - 1; col <= piece.Position.Column + 1; col++)
+				{
+					Tile test = new Tile(row, col);
+
+					if (!test.IsValid)
+					{
+						continue;
+					}
+
+					Piece targetPiece = Board[test];
+					if (targetPiece != null && targetPiece.Side == piece.Side)
+					{
+						continue;
+					}
+
+					res.Add(test);
+				}
+			}
+			
+			return res;
+		}
+
 		private List<Move> getValidQueenLocations(Piece piece)
 		{
 			if (piece.Type != PieceType.Queen)
@@ -288,7 +436,7 @@ namespace ChessBoard
 				throw new ArgumentException("Piece must be a queen.", nameof(piece));
 			}
 
-			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
+			addError(piece.Position, "ORIGINAL POSITION");
 
 			List<Move> res = new List<Move>();
 			Tile[] expandDirs = new Tile[8] {
@@ -316,7 +464,7 @@ namespace ChessBoard
 						}
 						else
 						{
-							InvalidErrors.Add(test, "OCCUPIED");
+							addError(test, "OCCUPIED");
 						}
 
 						break;
@@ -329,8 +477,53 @@ namespace ChessBoard
 					test += expandDirs[d];
 				}
 			}
+			
+			return res;
+		}
 
-			_validCache = res;
+		private List<Tile> getThreatenedQueenLocations(Piece piece)
+		{
+			if (piece.Type != PieceType.Queen)
+			{
+				throw new ArgumentException("Piece must be a queen.", nameof(piece));
+			}
+
+			List<Tile> res = new List<Tile>();
+			Tile[] expandDirs = new Tile[8] {
+				new Tile(-1, -1),
+				new Tile(0, -1),
+				new Tile(1, -1),
+				new Tile(-1, 0),
+				new Tile(1, 0),
+				new Tile(-1, 1),
+				new Tile(0, 1),
+				new Tile(1, 1)
+			};
+
+			for (int d = 0; d < expandDirs.Length; d++)
+			{
+				Tile test = piece.Position + expandDirs[d];
+				while (test.IsValid)
+				{
+					Piece targetPiece = Board[test];
+					if (targetPiece != null)
+					{
+						if (targetPiece.Side != piece.Side)
+						{
+							res.Add(test);
+						}
+
+						break;
+					}
+					else
+					{
+						res.Add(test);
+					}
+
+					test += expandDirs[d];
+				}
+			}
+			
 			return res;
 		}
 
@@ -341,7 +534,7 @@ namespace ChessBoard
 				throw new ArgumentException("Piece must be a rook.", nameof(piece));
 			}
 
-			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
+			addError(piece.Position, "ORIGINAL POSITION");
 
 			List<Move> res = new List<Move>();
 			Tile[] expandDirs = new Tile[4] {
@@ -365,7 +558,7 @@ namespace ChessBoard
 						}
 						else
 						{
-							InvalidErrors.Add(test, "OCCUPIED");
+							addError(test, "OCCUPIED");
 						}
 
 						break;
@@ -379,7 +572,48 @@ namespace ChessBoard
 				}
 			}
 
-			_validCache = res;
+			return res;
+		}
+
+		private List<Tile> getThreatenedRookLocations(Piece piece)
+		{
+			if (piece.Type != PieceType.Rook)
+			{
+				throw new ArgumentException("Piece must be a rook.", nameof(piece));
+			}
+
+			List<Tile> res = new List<Tile>();
+			Tile[] expandDirs = new Tile[4] {
+				new Tile(0, -1),
+				new Tile(-1, 0),
+				new Tile(1, 0),
+				new Tile(0, 1)
+			};
+
+			for (int d = 0; d < expandDirs.Length; d++)
+			{
+				Tile test = piece.Position + expandDirs[d];
+				while (test.IsValid)
+				{
+					Piece targetPiece = Board[test];
+					if (targetPiece != null)
+					{
+						if (targetPiece.Side != piece.Side)
+						{
+							res.Add(test);
+						}
+
+						break;
+					}
+					else
+					{
+						res.Add(test);
+					}
+
+					test += expandDirs[d];
+				}
+			}
+
 			return res;
 		}
 
@@ -390,7 +624,7 @@ namespace ChessBoard
 				throw new ArgumentException("Piece must be a bishop.", nameof(piece));
 			}
 
-			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
+			addError(piece.Position, "ORIGINAL POSITION");
 
 			List<Move> res = new List<Move>();
 			Tile[] expandDirs = new Tile[4] {
@@ -414,7 +648,7 @@ namespace ChessBoard
 						}
 						else
 						{
-							InvalidErrors.Add(test, "OCCUPIED");
+							addError(test, "OCCUPIED");
 						}
 
 						break;
@@ -427,8 +661,49 @@ namespace ChessBoard
 					test += expandDirs[d];
 				}
 			}
+			
+			return res;
+		}
 
-			_validCache = res;
+		private List<Tile> getThreatenedBishopLocations(Piece piece)
+		{
+			if (piece.Type != PieceType.Bishop)
+			{
+				throw new ArgumentException("Piece must be a bishop.", nameof(piece));
+			}
+
+			List<Tile> res = new List<Tile>();
+			Tile[] expandDirs = new Tile[4] {
+				new Tile(-1, -1),
+				new Tile(1, -1),
+				new Tile(-1, 1),
+				new Tile(1, 1)
+			};
+
+			for (int d = 0; d < expandDirs.Length; d++)
+			{
+				Tile test = piece.Position + expandDirs[d];
+				while (test.IsValid)
+				{
+					Piece targetPiece = Board[test];
+					if (targetPiece != null)
+					{
+						if (targetPiece.Side != piece.Side)
+						{
+							res.Add(test);
+						}
+
+						break;
+					}
+					else
+					{
+						res.Add(test);
+					}
+
+					test += expandDirs[d];
+				}
+			}
+			
 			return res;
 		}
 
@@ -440,7 +715,7 @@ namespace ChessBoard
 				throw new ArgumentException("Piece must be a knight.", nameof(piece));
 			}
 
-			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
+			addError(piece.Position, "ORIGINAL POSITION");
 
 			List<Move> res = new List<Move>();
 
@@ -461,21 +736,62 @@ namespace ChessBoard
 
 				if (!test.IsValid)
 				{
-					InvalidErrors.Add(test, "OFF BOARD");
+					addError(test, "OFF BOARD");
 					continue;
 				}
 
 				Piece targetPiece = Board[test];
 				if (targetPiece != null && targetPiece.Side == piece.Side)
 				{
-					InvalidErrors.Add(test, "OCCUPIED");
+					addError(test, "OCCUPIED");
 					continue;
 				}
 
 				res.Add(new Move(piece, test, Board));
 			}
+			
+			return res;
+		}
 
-			_validCache = res;
+		private List<Tile> getThreatenedKnightLocations(Piece piece)
+		{
+			if (piece.Type != PieceType.Knight)
+
+			{
+				throw new ArgumentException("Piece must be a knight.", nameof(piece));
+			}
+
+			List<Tile> res = new List<Tile>();
+
+			Tile[] offsets = new Tile[8] {
+				new Tile(1, 2),
+				new Tile(-1, 2),
+				new Tile(1, -2),
+				new Tile(-1, -2),
+				new Tile(2, 1),
+				new Tile(-2, 1),
+				new Tile(2, -1),
+				new Tile(-2, -1)
+			};
+
+			foreach (Tile o in offsets)
+			{
+				Tile test = piece.Position + o;
+
+				if (!test.IsValid)
+				{
+					continue;
+				}
+
+				Piece targetPiece = Board[test];
+				if (targetPiece != null && targetPiece.Side == piece.Side)
+				{
+					continue;
+				}
+
+				res.Add(test);
+			}
+			
 			return res;
 		}
 
@@ -486,7 +802,7 @@ namespace ChessBoard
 				throw new ArgumentException("Piece must be a pawn.", nameof(piece));
 			}
 
-			InvalidErrors.Add(piece.Position, "ORIGINAL POSITION");
+			addError(piece.Position, "ORIGINAL POSITION");
 
 			List<Move> res = new List<Move>();
 
@@ -500,6 +816,23 @@ namespace ChessBoard
 			return res;
 		}
 
+		private List<Tile> getThreatenedPawnLocations(Piece piece)
+		{
+			if (piece.Type != PieceType.Pawn)
+			{
+				throw new ArgumentException("Piece must be a pawn.", nameof(piece));
+			}
+
+			List<Tile> res = new List<Tile>();
+
+			int forward = piece.Side == Side.White ? 1 : -1;
+
+			checkPawnDiagonalThreat(piece, res, forward, -1);
+			checkPawnDiagonalThreat(piece, res, forward, 1);
+
+			return res;
+		}
+
 		private void checkPawnForward(Piece piece, List<Move> res, int forward)
 		{
 			Tile inFront = piece.Position + new Tile(forward, 0);
@@ -509,11 +842,11 @@ namespace ChessBoard
 			{
 				if (Board[inFront] != null)
 				{
-					InvalidErrors.Add(inFrontTwo, "BLOCKED");
+					addError(inFrontTwo, "BLOCKED");
 				}
 				else if (Board[inFrontTwo] != null)
 				{
-					InvalidErrors.Add(inFrontTwo, "OCCUPIED");
+					addError(inFrontTwo, "OCCUPIED");
 				}
 				else
 				{
@@ -525,7 +858,7 @@ namespace ChessBoard
 			{
 				if (Board[inFront] != null)
 				{
-					InvalidErrors.Add(inFront, "OCCUPIED");
+					addError(inFront, "OCCUPIED");
 				}
 				else
 				{
@@ -550,16 +883,38 @@ namespace ChessBoard
 					}
 					else
 					{
-						InvalidErrors.Add(diagonal, "EMPTY");
+						addError(diagonal, "EMPTY");
 					}
 				}
 				else if (Board[diagonal].Side == piece.Side)
 				{
-					InvalidErrors.Add(diagonal, "OCCUPIED");
+					addError(diagonal, "OCCUPIED");
 				}
 				else
 				{
 					res.Add(new Move(piece, diagonal, Board));
+				}
+			}
+		}
+
+		private void checkPawnDiagonalThreat(Piece piece, List<Tile> res, int forward, int leftRight)
+		{
+			Tile diagonal = piece.Position + new Tile(forward, leftRight);
+			Tile ep = piece.Position + new Tile(0, leftRight);
+
+			if (diagonal.IsValid)
+			{
+				if (Board[diagonal] == null)
+				{
+					// en passant check
+					if (Board[ep] != null && Board[ep].Type == PieceType.Pawn && Board[ep].PawnJustMovedDouble)
+					{
+						res.Add(diagonal);
+					}
+				}
+				else if (Board[diagonal].Side != piece.Side)
+				{
+					res.Add(diagonal);
 				}
 			}
 		}

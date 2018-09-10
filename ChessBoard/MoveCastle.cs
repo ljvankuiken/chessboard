@@ -37,6 +37,11 @@ namespace ChessBoard
 			RookTo = new Tile(king.Position.Row, kingTo.Column + (IsKingsSide ? -1 : 1));
 		}
 
+		public override Move DeepCopy(Board board)
+		{
+			return new MoveCastle(Piece.Clone(board), Rook.Clone(board), To, board);
+		}
+
 		public override void DoMove()
 		{
 			Piece.Position = To;

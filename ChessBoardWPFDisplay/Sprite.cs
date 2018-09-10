@@ -35,6 +35,12 @@ namespace ChessBoardWPFDisplay
 		public double Opacity
 		{ get; set; }
 
+		public bool Visible
+		{
+			get => Control.Visibility == Visibility.Visible;
+			set => Control.Visibility = value ? Visibility.Visible : Visibility.Hidden;
+		}
+
 		public AABB ActualBounds => new AABB(Position, ActualSize);
 
 		public Sprite(Canvas canvas, string path, Vector2 pos, double scale = 1.0, double opacity = 1.0, 

@@ -96,6 +96,8 @@ namespace ChessBoard
 			}
 		}
 
+		internal Board Parent;
+
 		public Board()
 		{
 			Validator = new MovementValidator(this);
@@ -145,6 +147,51 @@ namespace ChessBoard
 			}
 
 			Turn = Side.White;
+		}
+
+		public bool IsThreatened(Tile tile, Side threatening)
+		{
+			foreach (Piece p in Pieces)
+			{
+				if (p.Side == threatening)
+				{
+					List<Tile> threatenedTiles = Validator.GetThreatenedTiles(p);
+					if (threatenedTiles.Contains(tile))
+					{
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		public bool IsInCheck(Side side)
+		{
+			Piece king = Pieces.First(p => p.Side == side && p.Type == PieceType.King);
+			return IsThreatened(king.Position, side.Opposite());
+		}
+
+		public Board DeepCopy()
+		{
+			Board res = new Board(); // Validator cloned here.
+
+			res.Pieces.Clear();
+			foreach (Piece p in Pieces)
+			{
+				res.Pieces.Add(p.Clone(res));
+			}
+
+			res.Moves.Clear();
+			foreach (Move m in Moves)
+			{
+				res.Moves.Add(m.DeepCopy(res));
+			}
+
+			res.Turn = Turn;
+			res.Parent = this;
+
+			return res;
 		}
 		
 		internal void RemoveAt(Tile tile)

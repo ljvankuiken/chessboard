@@ -17,6 +17,9 @@ namespace ChessBoardWPFDisplay
 		public Sprite BoardSprite
 		{ get; }
 
+		public Sprite NotationOverlay
+		{ get; }
+
 		public double Scale
 		{ get; private set; }
 
@@ -37,6 +40,12 @@ namespace ChessBoardWPFDisplay
 
 		public bool EnforceTurns
 		{ get; set; }
+
+		public bool ShowNotationOverlay
+		{
+			get => NotationOverlay.Visible;
+			set => NotationOverlay.Visible = value;
+		}
 
 		public bool DebugMode
 		{
@@ -67,22 +76,26 @@ namespace ChessBoardWPFDisplay
 		{
 			Scale = 0.5;
 
-			BoardSprite = new Sprite(Canvas, "img/qualityboard_1024.png", new Point(50, 50), Scale);
-			BoardSprite.Control.Tag = "\"QUALITY\" CHESS BOARD";
+			BoardSprite = new Sprite(Canvas, "img/qualityboard_1024.png", new Vector2(50, 50), Scale);
+			NotationOverlay = new Sprite(Canvas, "img/notationoverlay_1024.png", new Vector2(50, 50), Scale, 0.65);
+			Panel.SetZIndex(NotationOverlay.Control, 1100);
 
 			Sprites.Add(BoardSprite);
+			Sprites.Add(NotationOverlay);
 			
 			Board = new Board();
 			Board.OnPieceMoved += onPieceMoved;
 
 			SetUpPiecesFromBoard();
 
-			EnforceTurns = true;
+			EnforceTurns = false;
+			ShowNotationOverlay = true;
 		}
 
 		public override void Initialize(RoutedEventArgs e)
 		{
 			BoardSprite.Initialize();
+			NotationOverlay.Initialize();
 
 			foreach (RenderedPiece rp in RenderedPieces)
 			{
@@ -265,7 +278,7 @@ namespace ChessBoardWPFDisplay
 					lines.Add("Open to en passant");
 				}
 
-				if (pointedAtPiece.Side != Board.Turn)
+				if (pointedAtPiece.Side != Board.Turn && EnforceTurns)
 				{
 					lines.Add("Wrong turn");
 				}
@@ -274,6 +287,15 @@ namespace ChessBoardWPFDisplay
 			if (!EnforceTurns)
 			{
 				lines.Add("TURNS DISABLED");
+			}
+
+			if (Board.IsInCheck(Side.White))
+			{
+				lines.Add("WHITE IS IN CHECK");
+			}
+			if (Board.IsInCheck(Side.Black))
+			{
+				lines.Add("BLACK IS IN CHECK");
 			}
 
 			// ---

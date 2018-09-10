@@ -58,6 +58,11 @@ namespace ChessBoard
 			}
 		}
 
+		public virtual Move DeepCopy(Board board)
+		{
+			return new Move(Piece.Clone(board), To, board);
+		}
+
 		/// <summary>
 		/// Activates the move on the <see cref="Board"/>. Should only ever be called once.
 		/// </summary>
