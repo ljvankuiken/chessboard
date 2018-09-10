@@ -86,7 +86,7 @@ namespace ChessBoardWPFDisplay
 			Sprites.Add(BoardSprite);
 			Sprites.Add(NotationOverlay);
 
-			Move.PreferredNotation = NotationType.PGN;
+			Move.PreferredNotation = NotationType.Algebraic;
 			
 			Board = new Board();
 			Board.OnPieceMoved += onPieceMoved;
@@ -111,7 +111,7 @@ namespace ChessBoardWPFDisplay
 			base.Initialize(e);
 		}
 
-		public void SetUpPiecesFromBoard()
+		public void SetUpPiecesFromBoard(bool reset = false)
 		{
 			RenderedPieces.Clear();
 
@@ -119,7 +119,13 @@ namespace ChessBoardWPFDisplay
 			{
 				if (p != null)
 				{
-					RenderedPieces.Add(new RenderedPiece(p, BoardSprite, Canvas));
+					RenderedPiece rp = new RenderedPiece(p, BoardSprite, Canvas);
+					if (reset)
+					{
+						rp.Initialize();
+					}
+
+					RenderedPieces.Add(rp);
 				}
 			}
 		}
@@ -237,6 +243,31 @@ namespace ChessBoardWPFDisplay
 			base.Refresh(e);
 		}
 
+		public void Reset()
+		{
+			Board.Reset();
+
+			foreach (RenderedPiece rp in RenderedPieces)
+			{
+				rp.Disconnect(Canvas);
+			}
+
+			SetUpPiecesFromBoard(true);
+
+			GrabbedPiece?.Disconnect(Canvas);
+			GrabbedPiece = null;
+
+			GrabbedGhost?.Disconnect(Canvas);
+			GrabbedGhost = null;
+			DeleteAllGhosts();
+
+			foreach (Rectangle r in GrabbedValidLocations)
+			{
+				Canvas.Children.Remove(r);
+			}
+			GrabbedValidLocations.Clear();
+		}
+
 		private Tile getTile(Vector2 posAbs)
 		{
 			Vector2 relPos = posAbs - BoardSprite.Position;
@@ -327,6 +358,7 @@ namespace ChessBoardWPFDisplay
 			{
 				lines.Add("");
 				string buffer = "";
+				int turn = 1;
 				foreach (Move m in Board.Moves)
 				{
 					if (EnforceTurns)
@@ -338,8 +370,9 @@ namespace ChessBoardWPFDisplay
 						else
 						{
 							buffer += m.ToString();
-							lines.Add(buffer);
+							lines.Add(turn.ToString() + ". " + buffer);
 							buffer = "";
+							turn++;
 						}
 					}
 					else
@@ -352,11 +385,11 @@ namespace ChessBoardWPFDisplay
 				{
 					if (status == GameStatus.InProgress)
 					{
-						lines.Add(buffer + "...");
+						lines.Add(turn.ToString() + ". " + buffer + "...");
 					}
 					else
 					{
-						lines.Add(buffer + "    ");
+						lines.Add(turn.ToString() + ". " + buffer + "    ");
 					}
 				}
 			}

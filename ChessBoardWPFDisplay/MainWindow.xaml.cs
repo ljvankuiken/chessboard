@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ChessBoard;
 
 namespace ChessBoardWPFDisplay
 {
@@ -68,6 +69,16 @@ namespace ChessBoardWPFDisplay
 
 		private void Window_KeyDown(object sender, KeyEventArgs e)
 		{
+			if (e.Key == Key.Enter && (e.KeyboardDevice.IsKeyDown(Key.LeftShift) || e.KeyboardDevice.IsKeyDown(Key.RightShift)))
+			{
+				ChessWrapper.Reset();
+			}
+
+			if (e.Key == Key.Space)
+			{
+				Move.PreferredNotation = Move.PreferredNotation.Cycle();
+			}
+
 			if (e.Key == Key.F1)
 			{
 				ChessWrapper.ShowNotationOverlay = !ChessWrapper.ShowNotationOverlay;

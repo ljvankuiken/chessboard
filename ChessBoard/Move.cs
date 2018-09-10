@@ -218,7 +218,7 @@ namespace ChessBoard
 				res = Piece.Type.Abbreviation(true);
 
 				IEnumerable<Piece> ambigOthers = Board.Pieces.Where(p => p != Piece && p.Type == Piece.Type && p.Side == Piece.Side);
-				if (ambigOthers.Count() > 0)
+				if (ambigOthers.Count() > 1 && Piece.Type != PieceType.Pawn)
 				{
 					res += "(" + From.ToStringEnglish(Piece.Side) + ")";
 				}

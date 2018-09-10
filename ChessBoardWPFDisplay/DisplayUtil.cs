@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using ChessBoard;
 
 namespace ChessBoardWPFDisplay
 {
@@ -42,6 +43,22 @@ namespace ChessBoardWPFDisplay
 			{
 				return def;
 			}
+		}
+
+		public static NotationType Cycle(this NotationType notation)
+		{
+			int id = (int)notation;
+
+			if (id < (int)NotationType.ICCF)
+			{
+				id++;
+			}
+			else
+			{
+				id = (int)NotationType.LaymanTemporary;
+			}
+
+			return (NotationType)id;
 		}
     }
 }
