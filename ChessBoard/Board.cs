@@ -183,10 +183,6 @@ namespace ChessBoard
 			}
 
 			res.Moves.Clear();
-			foreach (Move m in Moves)
-			{
-				res.Moves.Add(m.DeepCopy(res));
-			}
 
 			res.Turn = Turn;
 			res.Parent = this;
@@ -212,6 +208,8 @@ namespace ChessBoard
 
 		internal void AfterPieceMoved(PieceMovedEventArgs e)
 		{
+			Pieces.Sort(Piece.CompareForSorting);
+
 			OnPieceMoved(e.Move, e);
 		}
 	}

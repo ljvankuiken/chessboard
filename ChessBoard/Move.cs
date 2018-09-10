@@ -41,8 +41,12 @@ namespace ChessBoard
 		public Board Board
 		{ get; }
 
+		internal Guid ID;
+
 		public Move(Piece moved, Tile to, Board board)
 		{
+			ID = Guid.NewGuid();
+
 			Board = board;
 			Piece = moved;
 			From = Piece.Position;
@@ -58,11 +62,6 @@ namespace ChessBoard
 			}
 		}
 
-		public virtual Move DeepCopy(Board board)
-		{
-			return new Move(Piece.Clone(board), To, board);
-		}
-
 		/// <summary>
 		/// Activates the move on the <see cref="Board"/>. Should only ever be called once.
 		/// </summary>
@@ -72,14 +71,27 @@ namespace ChessBoard
 			Tile diff = To - From;
 			if (Piece.Type == PieceType.Pawn && diff.Abs() == Tile.UnitRC && Board[To] == null)
 			{
-				Tile victim = From + diff.ColumnOnly;
-				Board.RemoveAt(victim);
+				Tile victimPos = From + diff.ColumnOnly;
+				Board.RemoveAt(victimPos);
 			}
-			
-			Board[To] = Piece;
+
+			//Board[To] = Piece;
+			Piece victim = Board[To];
+			if (victim != null)
+			{
+				Board.Pieces.Remove(victim);
+			}
+			Piece.Position = To;
+
 			Piece.HasMoved = true;
 
 			Board.AfterPieceMoved(new PieceMovedEventArgs(this));
+		}
+
+		public override string ToString()
+		{
+			// non-standard for ease of readability
+			return $"{Piece.Side} {Piece.Type} from {From.GetPosAlgebraic()} to {To.GetPosAlgebraic()}";
 		}
 	}
 }

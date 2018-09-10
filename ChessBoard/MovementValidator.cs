@@ -89,7 +89,7 @@ namespace ChessBoard
 		{
 			BypassingCheck = bypassCheck;
 
-			if (_validCache != null && piece.Type == _cachedType && piece.Position == _cachedPosition && !BypassingCheck)
+			if (_validCache != null && piece.Type == _cachedType && piece.Position == _cachedPosition && !BypassingCheck && false)
 			{
 				return _validCache;
 			}
@@ -126,19 +126,19 @@ namespace ChessBoard
 				throw new ArgumentException("Piece must be from chess.", nameof(piece));
 			}
 
-			//if (!BypassingCheck)
-			//{
-			//	for (int i = res.Count - 1; i >= 0; i--)
-			//	{
-			//		Move m = res[i];
-			//
-			//		if (WouldLeaveInCheck(m, piece.Side))
-			//		{
-			//			res.RemoveAt(i);
-			//			addError(m.To, "STILL IN CHECK");
-			//		}
-			//	}
-			//}
+			if (!BypassingCheck)
+			{
+				for (int i = res.Count - 1; i >= 0; i--)
+				{
+					Move m = res[i];
+			
+					if (WouldLeaveInCheck(m, piece.Side))
+					{
+						res.RemoveAt(i);
+						addError(m.To, "STILL IN CHECK");
+					}
+				}
+			}
 
 			_validCache = res;
 
@@ -179,11 +179,12 @@ namespace ChessBoard
 		public bool WouldLeaveInCheck(Move moveOriginal, Side side)
 		{
 			Board future = Board.DeepCopy();
-			Move moveTested = moveOriginal.DeepCopy(future);
+			//Move moveTested = moveOriginal.DeepCopy(future);
+			Move moveTested = new Move(future[moveOriginal.From], moveOriginal.To, future);
 			future.Moves.Add(moveTested);
 			moveTested.DoMove();
 		
-			return Board.IsInCheck(side);
+			return future.IsInCheck(side);
 		}
 
 		/// <summary>

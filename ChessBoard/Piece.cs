@@ -12,11 +12,11 @@ namespace ChessBoard
 	public enum PieceType
 	{
 		King = 0,
-		Pawn,
+		Queen,
+		Rook,
 		Knight,
 		Bishop,
-		Rook,
-		Queen
+		Pawn,
 	}
 
 	/// <summary>
@@ -62,8 +62,12 @@ namespace ChessBoard
 		public bool PawnJustMovedDouble
 		{ get; set; }
 
+		internal Guid ID;
+
 		public Piece(PieceType type, Side side, Tile tile, Board board)
 		{
+			ID = Guid.NewGuid();
+
 			Position = tile;
 			Type = type;
 			Side = side;
@@ -117,6 +121,18 @@ namespace ChessBoard
 			{
 				PawnJustMovedDouble = false;
 			}
+		}
+
+		internal static int CompareForSorting(Piece a, Piece b)
+		{
+			int teamDiff = (int)a.Side - (int)b.Side;
+			if (teamDiff != 0)
+			{
+				return teamDiff * 10;
+			}
+
+			int valueDiff = (int)a.Type - (int)b.Type;
+			return valueDiff;
 		}
 
 		public bool EqualsShallow(Piece other)

@@ -172,6 +172,7 @@ namespace ChessBoardWPFDisplay
 
 			GrabbedGhost.Disconnect(Canvas);
 			GrabbedGhost = null;
+			DeleteAllGhosts();
 
 			foreach (Rectangle r in GrabbedValidLocations)
 			{
@@ -247,6 +248,20 @@ namespace ChessBoardWPFDisplay
 
 			lines.Add("Tile: " + Util.GetPosAlgebraic(tileY, tileX));
 
+			if (!EnforceTurns)
+			{
+				lines.Add("Turns Disabled");
+			}
+
+			if (Board.IsInCheck(Side.White))
+			{
+				lines.Add("WHITE IS IN CHECK");
+			}
+			if (Board.IsInCheck(Side.Black))
+			{
+				lines.Add("BLACK IS IN CHECK");
+			}
+
 			if (GrabbedPiece != null)
 			{
 				lines.Add("Grabbed Piece: " + GrabbedPiece.Piece.ToString());
@@ -280,22 +295,8 @@ namespace ChessBoardWPFDisplay
 
 				if (pointedAtPiece.Side != Board.Turn && EnforceTurns)
 				{
-					lines.Add("Wrong turn");
+					lines.Add($"{Board.Turn}'s turn");
 				}
-			}
-
-			if (!EnforceTurns)
-			{
-				lines.Add("TURNS DISABLED");
-			}
-
-			if (Board.IsInCheck(Side.White))
-			{
-				lines.Add("WHITE IS IN CHECK");
-			}
-			if (Board.IsInCheck(Side.Black))
-			{
-				lines.Add("BLACK IS IN CHECK");
 			}
 
 			// ---
@@ -324,6 +325,21 @@ namespace ChessBoardWPFDisplay
 
 			Board.Validator.ResetCache();
 			Board.SwitchTurn();
+		}
+
+		public void DeleteAllGhosts()
+		{
+			for (int i = Canvas.Children.Count - 1; i >= 0; i--)
+			{
+				UIElement uie = Canvas.Children[i];
+				if (uie is Image img)
+				{
+					if (img.Opacity < 0.5)
+					{
+						Canvas.Children.RemoveAt(i);
+					}
+				}
+			}
 		}
 	}
 }
