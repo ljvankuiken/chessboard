@@ -96,7 +96,7 @@ namespace ChessBoardWPFDisplay
 		{
 			Pieces.Clear();
 
-			foreach (Piece p in Board.Layout)
+			foreach (Piece p in Board.Pieces)
 			{
 				if (p != null)
 				{
